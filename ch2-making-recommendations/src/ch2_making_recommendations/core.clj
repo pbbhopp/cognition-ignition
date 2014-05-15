@@ -19,5 +19,4 @@
         sum-of-squares   (reduce 
                            + 
                            (map #(squares-of-differences prefs people %) (keys sim-liked-movies)))]
-    sum-of-squares)
-)
+    (/ 1 (+ 1 sum-of-squares))))

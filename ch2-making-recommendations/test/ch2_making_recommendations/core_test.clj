@@ -22,5 +22,4 @@
 
 (deftest sim-distance-test
   (testing "similarity scores: Euclidean distance"
-    (is (= (sim-distance critics ["Lisa Rose" "Gene Seymour"]) 5.75))))
-;0.148148148148
+    (is (= (sim-distance critics ["Lisa Rose" "Gene Seymour"]) 0.14814814814814814))))
