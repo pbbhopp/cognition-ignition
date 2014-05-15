@@ -22,6 +22,6 @@
 
 (deftest sim-distance-test
   (testing "similarity scores: Euclidean distance"
-    (is (= (sim-distance critics "Lisa Rose" "Gene Seymour") {"Lady in the Water" 1, "Snakes on a Plane" 1, 
+    (is (= (sim-distance critics ["Lisa Rose" "Gene Seymour"]) {"Lady in the Water" 1, "Snakes on a Plane" 1, 
                                                               "Just My Luck" 1, "Superman Returns" 1,  
                                                               "You, Me and Dupree" 1, "The Night Listener" 1}))))
