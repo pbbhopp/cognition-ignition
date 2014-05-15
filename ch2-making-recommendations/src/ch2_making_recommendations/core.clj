@@ -20,3 +20,13 @@
                            + 
                            (map #(squares-of-differences prefs people %) (keys sim-liked-movies)))]
     (/ 1 (+ 1 sum-of-squares))))
+
+(defn sim_pearson
+  "A slightly more sophisticated way to determine the similarity between people’s inter-
+   ests is to use a Pearson correlation coefficient. The correlation coefficient is a mea-
+   sure of how well two sets of data fit on a straight line. The formula for this is more
+   complicated than the Euclidean distance score, but it tends to give better results in
+   situations where the data isn’t well normalized."
+  [prefs people]
+  false
+)
