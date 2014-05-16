@@ -46,5 +46,8 @@
                                                (keys sim-liked-movies))) 
                                        (vals (select-keys 
                                                (get prefs (second people)) 
-                                               (keys sim-liked-movies)))))]
-    sums))
+                                               (keys sim-liked-movies)))))
+        n                  (count sim-liked-movies)]
+    (/ (- (get sums :xy-sums) (/ (* (get sums :x-sums) (get sums :y-sums)) n)) 
+       (math/sqrt (* (- (get sums :x-sq-sums) (/ (math/expt (get sums :x-sums) 2) n)) 
+                     (- (get sums :y-sq-sums) (/ (math/expt (get sums :y-sums) 2) n)))))))
