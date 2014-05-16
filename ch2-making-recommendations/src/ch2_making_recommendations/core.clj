@@ -14,8 +14,8 @@
   (let [sim-liked-movies (reduce
                            (fn [dict movie] (assoc dict movie 1)) 
                            {}
-                           (first (apply clojure.set/intersection 
-                             (map (fn [person] (hash-set (keys (get prefs person)))) people))))
+                           (apply clojure.set/intersection 
+                             (map (fn [person] (apply hash-set (keys (get prefs person)))) people)))
         sum-of-squares   (reduce 
                            + 
                            (map #(squares-of-differences prefs people %) (keys sim-liked-movies)))]
