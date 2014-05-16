@@ -33,5 +33,18 @@
                            {}
                            (apply clojure.set/intersection 
                              (map (fn [person] (apply hash-set (keys (get prefs person)))) people)))
-        sums             {:x-sums 0 :y-sums 0 :x-sq-sums 0 :y-sq-sums 0 :xy-sums 0}]
+        sums             (reduce
+                           (fn [sums xy] (assoc sums 
+                                           :x-sums (+ (get sums :x-sums) (first xy)) 
+                                           :y-sums (+ (get sums :y-sums) (second xy)) 
+                                           :x-sq-sums (+ (get sums :x-sq-sums) (math/expt (first xy) 2)) 
+                                           :y-sq-sums (+ (get sums :y-sq-sums) (math/expt (second xy) 2)) 
+                                           :xy-sums (+ (get sums :xy-sums) (* (first xy) (second xy)))))
+                           {:x-sums 0 :y-sums 0 :x-sq-sums 0 :y-sq-sums 0 :xy-sums 0}
+                           (map vector (vals (select-keys 
+                                               (get prefs (first people)) 
+                                               (keys sim-liked-movies))) 
+                                       (vals (select-keys 
+                                               (get prefs (second people)) 
+                                               (keys sim-liked-movies)))))]
     sums))
