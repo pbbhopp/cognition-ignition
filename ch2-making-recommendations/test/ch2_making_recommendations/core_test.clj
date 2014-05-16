@@ -26,5 +26,4 @@
 
 (deftest sim_pearson-test
   (testing "similarity scores: Pearson correlation coefficient"
-    (is (= (sim_pearson critics ["Lisa Rose" "Gene Seymour"]) 
-           {:x-sums 18.0, :y-sums 19.5, :x-sq-sums 55.0, :y-sq-sums 69.75, :xy-sums 59.5}))))
+    (is (= (sim_pearson critics ["Lisa Rose" "Gene Seymour"]) 0.396059017191))))
