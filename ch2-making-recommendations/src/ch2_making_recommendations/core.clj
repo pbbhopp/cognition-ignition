@@ -28,5 +28,10 @@
    complicated than the Euclidean distance score, but it tends to give better results in
    situations where the data isn’t well normalized."
   [prefs people]
-  false
-)
+  (let [sim-liked-movies (reduce
+                           (fn [dict movie] (assoc dict movie 1)) 
+                           {}
+                           (apply clojure.set/intersection 
+                             (map (fn [person] (apply hash-set (keys (get prefs person)))) people)))
+        sums             {:x-sums 0 :y-sums 0 :x-sq-sums 0 :y-sq-sums 0 :xy-sums 0}]
+    sums))
