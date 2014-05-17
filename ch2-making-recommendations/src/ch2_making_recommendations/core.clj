@@ -34,12 +34,11 @@
   [prefs people]
   (let [sim-liked-movies (get-similiar-likes prefs people)
         sums             (reduce
-                           (fn [sums [x y]] (assoc sums 
-                                           :x-sums (+ (get sums :x-sums) x) 
-                                           :y-sums (+ (get sums :y-sums) y) 
-                                           :x-sq-sums (+ (get sums :x-sq-sums) (math/expt x 2)) 
-                                           :y-sq-sums (+ (get sums :y-sq-sums) (math/expt y 2)) 
-                                           :xy-sums (+ (get sums :xy-sums) (* x y))))
+                           (fn [sums [x y]] 
+                             (merge-with + sums 
+                               {:x-sums x :y-sums y 
+                                :x-sq-sums (math/expt x 2) :y-sq-sums (math/expt y 2) 
+                                :xy-sums (* x y)}))
                            {:x-sums 0 :y-sums 0 :x-sq-sums 0 :y-sq-sums 0 :xy-sums 0}
                            (map vector (vals (select-keys 
                                                (get prefs (first people)) 
