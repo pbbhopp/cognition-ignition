@@ -27,3 +27,10 @@
 (deftest sim_pearson-test
   (testing "similarity scores: Pearson correlation coefficient"
     (is (= (sim_pearson critics ["Lisa Rose" "Gene Seymour"]) 0.39605901719066977))))
+
+(deftest top-matches-test
+  (testing "function that scores everyone against a given person and finds the closest matches"
+    (is (= (top-matches critics "Toby" 3) 
+           [(0.9912407071619299, 'Lisa Rose'), (0.9244734516419049, 'Mick LaSalle'), 
+            (0.8934051474415647, 'Claudia Puig'), (0.66284898035987, 'Jack Matthews'), 
+            (0.38124642583151164, 'Gene Seymour'), (-1.0, 'Michael Phillips')]))))
