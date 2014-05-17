@@ -32,3 +32,9 @@
   (testing "function that scores everyone against a given person and finds the closest matches"
     (is (= (top-matches critics "Toby" :n 3) 
            [[0.9912407071619299 "Lisa Rose"] [0.9244734516419049 "Mick LaSalle"] [0.8934051474415647 "Claudia Puig"]]))))
+
+(deftest get-recommendations-test
+  (testing "recommendation by ranked list of movies"
+    (is (= (get-recommendations critics "Toby") 
+        {"Lady in the Water" 8.383808341404684, "Just My Luck" 8.074754105841562, "The Night Listener" 12.89975185847269})))) 
+        ;[[3.3477895267131013 "The Night Listener"], [2.8325499182641614 "Lady in the Water"], [2.5309807037655645 "Just My Luck"]]))))

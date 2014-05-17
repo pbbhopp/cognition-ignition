@@ -52,11 +52,12 @@
                      (- (get sums :y-sq-sums) (/ (math/expt (get sums :y-sums) 2) n)))))))
 
 (defn top-matches
-  "With above similiarity functions for comparing two people, we can create a function
-   that scores everyone against a given person and finds the closest matches. In this
-   case, we are interested in learning which movie critics have tastes simliar to mine 
-   so that we know whose advice we should take when deciding on a movie. Get an ordered 
-   list of people with similar tastes to the specified person"
+  "With above similiarity functions for comparing two people, we can create a 
+   function that scores everyone against a given person and finds the closest 
+   matches. In this case, we are interested in learning which movie critics 
+   have tastes simliar to specified person so that we know whose advice we 
+   should take when deciding on a movie. Get an ordered list of people with 
+   similar tastes to the specified person"
   [prefs person & {:keys [n similarity] :or {n 3 similarity sim-pearson}}]
   (let [sim    (fn [other] [(similarity prefs [person other]) other])
         scores (into [] (map sim (keys (dissoc prefs person))))]
