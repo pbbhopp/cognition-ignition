@@ -25,7 +25,7 @@
                            (map #(squares-of-differences prefs people %) (keys sim-liked-movies)))]
     (/ 1 (+ 1 sum-of-squares))))
 
-(defn sim_pearson
+(defn sim-pearson
   "A slightly more sophisticated way to determine the similarity between people’s inter-
    ests is to use a Pearson correlation coefficient. The correlation coefficient is a mea-
    sure of how well two sets of data fit on a straight line. The formula for this is more
@@ -50,3 +50,14 @@
     (/ (- (get sums :xy-sums) (/ (* (get sums :x-sums) (get sums :y-sums)) n)) 
        (math/sqrt (* (- (get sums :x-sq-sums) (/ (math/expt (get sums :x-sums) 2) n)) 
                      (- (get sums :y-sq-sums) (/ (math/expt (get sums :y-sums) 2) n)))))))
+
+(defn top-matches
+  "With above similiarity functions for comparing two people, we can create a function
+   that scores everyone against a given person and finds the closest matches. In this
+   case, we are interested in learning which movie critics have tastes simliar to mine 
+   so that we know whose advice we should take when deciding on a movie. Get an ordered 
+   list of people with similar tastes to the specified person"
+  [prefs person & {:keys [n similarity] :or {n 3 similarity sim-pearson}}]
+  (let [sim    (fn [other] [(similarity prefs [person other]) other])
+        scores (into [] (map sim (keys (dissoc prefs person))))]
+    (take n (sort-by first > scores))))
