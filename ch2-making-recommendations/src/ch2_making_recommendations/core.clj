@@ -25,6 +25,15 @@
                            (map #(squares-of-differences prefs people %) (keys sim-liked-movies)))]
     (/ 1 (+ 1 sum-of-squares))))
 
+(defn make-calc-sums []
+  {:X 0 :Y 0 :XX 0 :YY 0 :XY 0})
+
+(defn calc-xy [x y]
+  {:X x :Y y :XX (math/expt x 2) :YY (math/expt y 2) :XY (* x y)})
+
+(defn add-sums [sum1 sum2]
+  (merge-with + sum1 sum2))
+
 (defn sim-pearson
   "A slightly more sophisticated way to determine the similarity between people’s inter-
    ests is to use a Pearson correlation coefficient. The correlation coefficient is a mea-
@@ -35,21 +44,19 @@
   (let [sim-liked-movies (get-similiar-likes prefs people)
         sums             (reduce
                            (fn [sums [x y]] 
-                             (merge-with + sums 
-                               {:x-sums x :y-sums y 
-                                :x-sq-sums (math/expt x 2) :y-sq-sums (math/expt y 2) 
-                                :xy-sums (* x y)}))
-                           {:x-sums 0 :y-sums 0 :x-sq-sums 0 :y-sq-sums 0 :xy-sums 0}
+                             (add-sums sums (calc-xy x y)))
+                           (make-calc-sums)
                            (map vector (vals (select-keys 
                                                (get prefs (first people)) 
                                                (keys sim-liked-movies))) 
                                        (vals (select-keys 
                                                (get prefs (second people)) 
                                                (keys sim-liked-movies)))))
+        {X :X Y :Y 
+         XX :XX YY :YY
+         XY :XY}         sums
         n                (count sim-liked-movies)]
-    (/ (- (get sums :xy-sums) (/ (* (get sums :x-sums) (get sums :y-sums)) n)) 
-       (math/sqrt (* (- (get sums :x-sq-sums) (/ (math/expt (get sums :x-sums) 2) n)) 
-                     (- (get sums :y-sq-sums) (/ (math/expt (get sums :y-sums) 2) n)))))))
+    (/ (- XY (/ (* X Y) n)) (math/sqrt (* (- XX (/ (math/expt X 2) n)) (- YY (/ (math/expt Y 2) n)))))))
 
 (defn top-matches
   "With above similiarity functions for comparing two people, we can create a 
@@ -62,3 +69,10 @@
   (let [sim    (fn [other] [(similarity prefs [person other]) other])
         scores (into [] (map sim (keys (dissoc prefs person))))]
     (take n (sort-by first > scores))))
+
+
+(defn get-recommendations
+  "Gets recommendations for a person by using a weighted average of every other 
+   user's rankings"
+  [prefs person]
+  {})
