@@ -25,6 +25,9 @@
                            (map #(squares-of-differences prefs people %) (keys sim-liked-movies)))]
     (/ 1 (+ 1 sum-of-squares))))
 
+(defn- get-scores [data person movies] 
+  (vals (select-keys (get data person) (keys movies))))
+
 (defn make-calc-sums []
   {:X 0 :Y 0 :XX 0 :YY 0 :XY 0})
 
@@ -43,16 +46,13 @@
   [prefs people]
   (let [sim-liked-movies (get-similiar-likes prefs people)
         sums             (reduce
-                           (fn [sums [x y]] 
-                             (add-sums sums (calc-xy x y)))
+                           (fn [sums [x y]] (add-sums sums (calc-xy x y)))
                            (make-calc-sums)
-                           (map vector (vals (select-keys 
-                                               (get prefs (first people)) 
-                                               (keys sim-liked-movies))) 
-                                       (vals (select-keys 
-                                               (get prefs (second people)) 
-                                               (keys sim-liked-movies)))))
-        {X :X Y :Y 
+                           (map 
+                             vector 
+                             (get-scores prefs (first people) sim-liked-movies)
+                             (get-scores prefs (second people) sim-liked-movies)))
+        { X :X   Y :Y 
          XX :XX YY :YY
          XY :XY}         sums
         n                (count sim-liked-movies)]
