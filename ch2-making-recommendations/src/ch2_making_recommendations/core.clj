@@ -70,9 +70,34 @@
         scores (into [] (map sim (keys (dissoc prefs person))))]
     (take n (sort-by first > scores))))
 
+(defn unmatched-movies
+  "Find movies that subject *person* haven't seen that *other* person has seen"
+  [data person other]
+  (let [set-person (apply hash-set (keys (get data person)))
+        set-other  (apply hash-set (keys (get data other)))]
+    (clojure.set/difference set-other set-person)))
+
+(defn- calc-in [prefs other diff f] 
+  (reduce (fn [coll mov] (into coll {mov (f (get-in prefs [other mov] 0))})) {} diff))
 
 (defn get-recommendations
   "Gets recommendations for a person by using a weighted average of every other 
    user's rankings"
-  [prefs person]
-  {})
+  [prefs person & {:keys [similarity] :or {similarity sim-pearson}}]
+  (let [others (filter (fn [other] (pos? (:sim other))) 
+                 (for [other (keys (dissoc prefs person))] 
+                   {:name other :sim (similarity prefs [person other])}))
+        sums   (reduce
+                 (fn [sums other-person] 
+                   (let [sim   (:sim other-person)
+                         other (:name other-person)
+                         diff  (unmatched-movies prefs person other)
+                         S     {:totals (calc-in prefs other diff (fn [v] (* v sim))) 
+                                :sim-sums (calc-in prefs other diff (fn [& v] sim))}
+                         tot   (merge-with + (:totals sums) (:totals S))
+                         ssum  (merge-with + (:sim-sums sums) (:sim-sums S))]
+                     (assoc sums :totals tot :sim-sums ssum)))   
+                 {:totals {} :sim-sums {}}
+                 others)]
+    sums))
+
