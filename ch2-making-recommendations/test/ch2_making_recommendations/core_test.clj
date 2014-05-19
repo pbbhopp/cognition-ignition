@@ -36,4 +36,5 @@
 (deftest get-recommendations-test
   (testing "recommendation by ranked list of movies"
     (let [ranks (get-recommendations critics "Toby")]
+      (is (= (keys (:totals ranks)) (keys (:sim-sums ranks))))
       (is (= ranks [[3.3477895267131013 "The Night Listener"] [2.8325499182641614 "Lady in the Water"] [2.5309807037655645 "Just My Luck"]])))))

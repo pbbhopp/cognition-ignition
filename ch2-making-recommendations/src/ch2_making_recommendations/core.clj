@@ -84,20 +84,23 @@
   "Gets recommendations for a person by using a weighted average of every other 
    user's rankings"
   [prefs person & {:keys [similarity] :or {similarity sim-pearson}}]
-  (let [others (filter (fn [other] (pos? (:sim other))) 
-                 (for [other (keys (dissoc prefs person))] 
-                   {:name other :sim (similarity prefs [person other])}))
-        sums   (reduce
-                 (fn [sums other-person] 
-                   (let [sim   (:sim other-person)
-                         other (:name other-person)
-                         diff  (unmatched-movies prefs person other)
-                         S     {:totals (calc-in prefs other diff (fn [v] (* v sim))) 
-                                :sim-sums (calc-in prefs other diff (fn [& v] sim))}
-                         tot   (merge-with + (:totals sums) (:totals S))
-                         ssum  (merge-with + (:sim-sums sums) (:sim-sums S))]
-                     (assoc sums :totals tot :sim-sums ssum)))   
-                 {:totals {} :sim-sums {}}
-                 others)]
-    sums))
+  (let [others    (filter (fn [other] (pos? (:sim other))) 
+                    (for [other (keys (dissoc prefs person))] 
+                      {:name other :sim (similarity prefs [person other])}))
+        sums      (reduce
+                    (fn [sums other-person] 
+                      (let [sim   (:sim other-person)
+                            other (:name other-person)
+                            diff  (unmatched-movies prefs person other)
+                            S     {:totals (calc-in prefs other diff (fn [v] (* v sim))) 
+                                   :sim-sums (calc-in prefs other diff (fn [& _] sim))}
+                            tot   (merge-with + (:totals sums) (:totals S))
+                            ssum  (merge-with + (:sim-sums sums) (:sim-sums S))]
+                        (assoc sums :totals tot :sim-sums ssum)))   
+                    {:totals {} :sim-sums {}}
+                    others)
+        totals   (:totals sums)
+        sim-sums (:sim-sums sums)  
+        ranks    (map #(vector (/ (get totals %) (get sim-sums %)) %) (keys totals))]
+    (sort-by first > ranks)))
 
