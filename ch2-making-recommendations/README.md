@@ -17,7 +17,7 @@ tory of shows you’ve seen before and alert you to upcoming shows that might be
 interest. Sites like reddit.com let you vote on links to other web sites and then use
 your votes to suggest other links you might find interesting.
 
-From these examples, you can see that preferences can be collected in many differ-
+From these examples, you can see that preferences can be collected in many differ
 ent ways. Sometimes the data are items that people have purchased, and opinions
 about these items might be represented as yes/no votes or as ratings from one to five.
 In this chapter, we’ll look at different ways of representing these cases so that they’ll
