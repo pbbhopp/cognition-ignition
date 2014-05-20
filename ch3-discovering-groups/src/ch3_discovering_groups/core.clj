@@ -25,5 +25,9 @@
          XX :XX 
          YY :YY
          XY :XY} sums
-         num     (- XY (/ (* X Y) (count v1)))]
-    num))
+         num     (- XY (/ (* X Y) (count v1)))
+         n       (count v1)
+         den     (math/sqrt
+                   (* (- XX (/ (math/expt X 2) n)) 
+                      (- YY (/ (math/expt Y 2) n))))]
+    den))
