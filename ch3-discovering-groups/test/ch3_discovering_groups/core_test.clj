@@ -9,6 +9,5 @@
 
 (deftest pearson-test
   (testing "Pearson score"
-    ;(is (= (pearson v1 v2) 0.250049252619)
-    (is (= (pearson v1 v2) 220.0724232055815))))
+    (is (= (pearson v1 v2) 0.25004925261947253))))
 

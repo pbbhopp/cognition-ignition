@@ -2,9 +2,6 @@
   (:require [clojure.set]
             [clojure.math.numeric-tower :as math]))
 
-(defn- get-scores [data person movies] 
-  (vals (select-keys (get data person) (keys movies))))
-
 (defn make-calc-sums []
   {:X 0 :Y 0 :XX 0 :YY 0 :XY 0})
 
@@ -25,9 +22,10 @@
          XX :XX 
          YY :YY
          XY :XY} sums
-         num     (- XY (/ (* X Y) (count v1)))
          n       (count v1)
-         den     (math/sqrt
+         num     (- XY (/ (* X Y) n))
+         d       (math/sqrt
                    (* (- XX (/ (math/expt X 2) n)) 
-                      (- YY (/ (math/expt Y 2) n))))]
-    den))
+                      (- YY (/ (math/expt Y 2) n))))
+         den     (if (pos? d) d 0)]
+    (- 1.0 (/ num den))))
