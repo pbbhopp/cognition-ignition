@@ -38,3 +38,6 @@
   (testing "Pearson score"
     (is (= (pearson v1 v2) 0.25004925261947253))))
 
+(deftest kmeans-test
+  (testing "kmeans clustering"
+    (is (= (take 5 (kmeans (:word-counts data))) [0.7408868896992121 0.31305486463589927 3.992773202381228 20.445880868103867 15.259185101093632]))))
