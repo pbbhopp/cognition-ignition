@@ -16,4 +16,4 @@
 (deftest kmeans-test
   (testing "kmeans clustering"
     (is (= (kmeans k-data)
-           [[3.133106875072385 2.6939433494725322] [3.626512989611212 5.3012780987114]]))))
+           [[0 1 2 4 6] [3, 5]]))))
