@@ -33,6 +33,9 @@
 (defn find-by [f lazy-coll]
   (reduce #(conj %1 (apply f (doall %2))) [] lazy-coll))
 
+(defn centroids [coll]
+  (map #(+ (* (rand) (- (second %) (first %))) (first %)) coll))
+
 (defn kmeans
   "The K-means algorithm will determine the size of the clusters based on the
    structure of the data. K-means clustering begins with k randomly placed
@@ -43,7 +46,7 @@
    changing."
   [rows & {:keys [k] :or {k 2}}]
   (let [nrows     (count rows)
-        ncols     (count (first rows))
         col-group (partition nrows (apply interleave rows))
-        ranges    (split-at ncols (interleave (find-by min col-group) (find-by max col-group)))]
-    ranges))
+        ranges    (split-at 2 (interleave (find-by min col-group) (find-by max col-group)))
+        clusters  (for [i (range k)] (centroids ranges))]
+    clusters))
