@@ -24,17 +24,22 @@
          XY :XY} sums
          n       (count v1)
          num     (- XY (/ (* X Y) n))
-         d       (math/sqrt
+         den     (math/sqrt
                    (* (- XX (/ (math/expt X 2) n)) 
-                      (- YY (/ (math/expt Y 2) n))))
-         den     (if (pos? d) d 0)]
-    (- 1.0 (/ num den))))
+                      (- YY (/ (math/expt Y 2) n))))]
+    (if (pos? den) (- 1.0 (/ num den)) 0)))
 
 (defn find-by [f lazy-coll]
   (reduce #(conj %1 (apply f (doall %2))) [] lazy-coll))
 
 (defn centroids [coll]
   (map #(+ (* (rand) (- (second %) (first %))) (first %)) coll))
+
+(defn find-closet-centroid [matches point centroids] 
+  (let [dists   (map #(pearson % point) centroids)
+        closest (apply min dists) 
+        idx-k   (.indexOf dists closest)]
+    (merge-with into matches {idx-k #{point}})))
 
 (defn kmeans
   "The K-means algorithm will determine the size of the clusters based on the
@@ -48,5 +53,10 @@
   (let [nrows     (count rows)
         col-group (partition nrows (apply interleave rows))
         ranges    (split-at 2 (interleave (find-by min col-group) (find-by max col-group)))
-        clusters  (for [i (range k)] (centroids ranges))]
-    clusters))
+        clusters  (for [i (range k)] (centroids ranges))
+        matches   (reduce #(merge %1 {%2 #{}}) {} (range k)) 
+        best-fit  (reduce
+                    #(find-closet-centroid %1 %2 clusters)
+                    matches
+                    rows)]
+    best-fit))
