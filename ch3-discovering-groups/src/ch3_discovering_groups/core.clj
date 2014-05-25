@@ -41,6 +41,20 @@
         idx-k   (.indexOf dists closest)]
     (merge-with into matches {idx-k #{point}})))
 
+(defn cols-sums [coll]
+  (map #(apply + %) (partition (count coll) (apply interleave coll))))
+
+(defn mov-avgs [best-fit kclusters]
+  (reduce
+    (fn [coll fits]
+      (let [idx  (int (first fits))
+            pts  (second fits) 
+            sums (cols-sums pts)]
+        (assoc kclusters idx sums)))
+    kclusters
+    best-fit)
+  kclusters)
+
 (defn kmeans
   "The K-means algorithm will determine the size of the clusters based on the
    structure of the data. K-means clustering begins with k randomly placed
@@ -53,10 +67,10 @@
   (let [nrows     (count rows)
         col-group (partition nrows (apply interleave rows))
         ranges    (split-at 2 (interleave (find-by min col-group) (find-by max col-group)))
-        clusters  (for [i (range k)] (centroids ranges))
+        kclusters (for [i (range k)] (centroids ranges))
         matches   (reduce #(merge %1 {%2 #{}}) {} (range k)) 
         best-fit  (reduce
-                    #(find-closet-centroid %1 %2 clusters)
+                    #(find-closet-centroid %1 %2 kclusters)
                     matches
                     rows)]
     best-fit))
