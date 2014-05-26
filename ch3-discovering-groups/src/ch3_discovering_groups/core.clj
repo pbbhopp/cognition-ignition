@@ -47,7 +47,7 @@
 (defn mov-avgs [best-fit kclusters]
   (reduce
     (fn [coll fits]
-      (let [idx  (int (first fits))
+      (let [idx  (first fits)
             pts  (second fits) 
             sums (cols-sums pts)]
         (assoc kclusters idx sums)))
@@ -63,14 +63,19 @@
    are moved to the average location of all the nodes assigned to them, and
    the assignments are redone. This process repeats until the assignments stop
    changing."
-  [rows & {:keys [k] :or {k 2}}]
+  [rows & {:keys [k iter] :or {k 2 iter 100}}]
   (let [nrows     (count rows)
         col-group (partition nrows (apply interleave rows))
         ranges    (split-at 2 (interleave (find-by min col-group) (find-by max col-group)))
         kclusters (for [i (range k)] (centroids ranges))
         matches   (reduce #(merge %1 {%2 #{}}) {} (range k)) 
-        best-fit  (reduce
-                    #(find-closet-centroid %1 %2 kclusters)
-                    matches
-                    rows)]
+        best-fit  (for [i (range iter)
+                      :let [bestmatches (reduce
+                                          #(find-closet-centroid %1 %2 kclusters)
+                                          matches
+                                          rows)
+                            lastmatches bestmatches
+                            kclusters   (mov-avgs bestmatches kclusters)]
+                      :when (not= lastmatches bestmatches)]
+                    bestmatches)]
     best-fit))
