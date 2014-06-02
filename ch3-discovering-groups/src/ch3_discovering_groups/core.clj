@@ -40,6 +40,9 @@
         closest (apply min dists)]
     (.indexOf dists closest)))
 
+(defn find-closet-centroids [kclusters data] 
+  (map #(find-closet-centroid % kclusters) data))
+
 (defn cols-sums [coll]
   (map #(apply + %) (partition (count coll) (apply interleave coll))))
 
