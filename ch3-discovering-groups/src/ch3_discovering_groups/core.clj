@@ -42,3 +42,9 @@
 
 (defn cols-sums [coll]
   (map #(apply + %) (partition (count coll) (apply interleave coll))))
+
+(defn make-ranges [data]
+  (let [nrows     (count data)
+        col-group (partition nrows (apply interleave data))
+        ranges    (partition 2 (interleave (find-by min col-group) (find-by max col-group)))]
+    ranges))

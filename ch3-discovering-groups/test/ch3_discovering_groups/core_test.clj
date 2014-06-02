@@ -13,13 +13,7 @@
   (testing "Pearson score"
     (is (= (pearson v1 v2) 0.25004925261947253))))
 
-(deftest mov-avgs-test
-  (testing "move averages"
-    (is (= (mov-avgs {0 #{[1.0 1.0] [1.5 2.0] [3.0 4.0] [3.5, 5.0] [3.5 4.5]} 1 #{[5.0 7.0] [4.5 5.0]}}
-                     [[3.133106875072385 2.6939433494725322] [3.626512989611212 5.3012780987114]]) 
-           [[3.133106875072385 2.6939433494725322] [3.626512989611212 5.3012780987114]]))))
-
-(deftest kmeans-test
-  (testing "kmeans clustering"
-    (is (= (kmeans k-data)
-           [[0 1 2 4 6] [3, 5]]))))
+(deftest make-ranges-test
+  (testing "making ranges"
+    (is (= (make-ranges [[1.0 1.0] [1.5 2.0] [3.0 4.0] [5.0 7.0] [3.5 5.0] [4.5 5.0] [3.5 4.5]]) 
+           '((1.0 5.0) (1.0 7.0))))))
