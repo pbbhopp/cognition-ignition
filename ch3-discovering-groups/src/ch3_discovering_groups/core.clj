@@ -30,7 +30,7 @@
     (if (pos? den) (- 1.0 (/ num den)) 0)))
 
 (defn find-by [f lazy-coll]
-  (reduce #(conj %1 (apply f (doall %2))) [] lazy-coll))
+  (reduce #(conj %1 (apply f %2)) [] lazy-coll))
 
 (defn centroids [min-max]
   (+ (* (rand) (- (second min-max) (first min-max))) (first min-max)))
