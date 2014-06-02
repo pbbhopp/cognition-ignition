@@ -60,3 +60,8 @@
 
 (defn group-by-cluster [clusters data]
   (group-by first (partition 2 (interleave clusters data))))
+    
+(defn mov-avg [idx kgroups]
+  (let [points (map second (get kgroups idx))
+        sums   (if (> (count points) 1) (cols-sums points) points)] 
+    (map #(/ % (count points)) sums)))
