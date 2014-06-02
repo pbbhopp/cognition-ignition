@@ -54,28 +54,3 @@
     kclusters
     best-fit)
   kclusters)
-
-(defn kmeans
-  "The K-means algorithm will determine the size of the clusters based on the
-   structure of the data. K-means clustering begins with k randomly placed
-   centroids (points in space that represent the center of the cluster), and
-   assigns every item to the nearest one. After the assignment, the centroids
-   are moved to the average location of all the nodes assigned to them, and
-   the assignments are redone. This process repeats until the assignments stop
-   changing."
-  [rows & {:keys [k iter] :or {k 2 iter 100}}]
-  (let [nrows     (count rows)
-        col-group (partition nrows (apply interleave rows))
-        ranges    (split-at 2 (interleave (find-by min col-group) (find-by max col-group)))
-        kclusters (for [i (range k)] (centroids ranges))
-        matches   (reduce #(merge %1 {%2 #{}}) {} (range k)) 
-        best-fit  (for [i (range iter)
-                      :let [bestmatches (reduce
-                                          #(find-closet-centroid %1 %2 kclusters)
-                                          matches
-                                          rows)
-                            lastmatches bestmatches
-                            kclusters   (mov-avgs bestmatches kclusters)]
-                      :when (not= lastmatches bestmatches)]
-                    bestmatches)]
-    best-fit))
