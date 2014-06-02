@@ -32,8 +32,8 @@
 (defn find-by [f lazy-coll]
   (reduce #(conj %1 (apply f (doall %2))) [] lazy-coll))
 
-(defn centroids [coll]
-  (map #(+ (* (rand) (- (second %) (first %))) (first %)) coll))
+(defn centroids [min-max]
+  (+ (* (rand) (- (second min-max) (first min-max))) (first min-max)))
 
 (defn find-closet-centroid [point centroids]
   (let [dists   (map #(pearson % point) centroids)
@@ -48,3 +48,9 @@
         col-group (partition nrows (apply interleave data))
         ranges    (partition 2 (interleave (find-by min col-group) (find-by max col-group)))]
     ranges))
+
+(defn calc-kcluster [ranges]
+  (map centroids ranges))
+
+(defn make-kclusters [k data]
+  (take k (repeatedly (fn [] (calc-kcluster (make-ranges data))))))
