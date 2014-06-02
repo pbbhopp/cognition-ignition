@@ -42,14 +42,3 @@
 
 (defn cols-sums [coll]
   (map #(apply + %) (partition (count coll) (apply interleave coll))))
-
-(defn mov-avgs [best-fit kclusters]
-  (reduce
-    (fn [coll fits]
-      (let [idx  (first fits)
-            pts  (second fits) 
-            sums (cols-sums pts)]
-        (assoc kclusters idx sums)))
-    kclusters
-    best-fit)
-  kclusters)
