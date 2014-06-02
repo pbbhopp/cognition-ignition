@@ -65,3 +65,6 @@
   (let [points (map second (get kgroups idx))
         sums   (if (> (count points) 1) (cols-sums points) points)] 
     (map #(/ % (count points)) sums)))
+
+(defn mov-avgs [kgroups kclusters]
+  (map-indexed #(if (contains? kgroups %1) (mov-avg %1 kgroups) %2) kclusters))
