@@ -35,11 +35,10 @@
 (defn centroids [coll]
   (map #(+ (* (rand) (- (second %) (first %))) (first %)) coll))
 
-(defn find-closet-centroid [matches point centroids] 
+(defn find-closet-centroid [point centroids]
   (let [dists   (map #(pearson % point) centroids)
-        closest (apply min dists) 
-        idx-k   (.indexOf dists closest)]
-    (merge-with into matches {idx-k #{point}})))
+        closest (apply min dists)]
+    (.indexOf dists closest)))
 
 (defn cols-sums [coll]
   (map #(apply + %) (partition (count coll) (apply interleave coll))))
