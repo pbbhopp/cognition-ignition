@@ -15,17 +15,22 @@
 
 (deftest make-ranges-test
   (testing "making ranges"
-    (is (= (make-ranges [[1.0 1.0] [1.5 2.0] [3.0 4.0] [5.0 7.0] [3.5 5.0] [4.5 5.0] [3.5 4.5]]) 
+    (is (= (make-ranges k-data) 
            '((1.0 5.0) (1.0 7.0))))))
 
 (deftest make-kclusters-test
   (testing "making kclusters"
-    (is (= (make-kclusters 2 [[1.0 1.0] [1.5 2.0] [3.0 4.0] [5.0 7.0] [3.5 5.0] [4.5 5.0] [3.5 4.5]]) 
+    (is (= (make-kclusters 2 k-data) 
            '((1.9414881374080548 6.977366215048392) (1.4885417715569864 5.5302676090029905))))))
 
 (deftest find-closet-centroids-test
   (testing "finding closet centroids"
     (is (= (find-closet-centroids '((2.1703800354942318 4.944804329369732) (2.0361218298131245 4.915444634854198) 
                                    (1.2161059075686835 4.510667599602532) (3.4388029068605683 5.6953197662282005)) 
-                                  [[1.0 1.0] [1.5 2.0] [3.0 4.0] [5.0 7.0] [3.5 5.0] [4.5 5.0] [3.5 4.5]]) 
+                                  k-data) 
            '(0 1 1 1 0 3 2)))))
+
+(deftest group-by-cluster-test
+  (testing "grouping by cluster"
+    (is (= (group-by-cluster '(0 1 1 1 0 3 2) k-data) 
+           {0 ['(0 [1.0 1.0]) '(0 [3.5 5.0])] 1 ['(1 [1.5 2.0]) '(1 [3.0 4.0]) '(1 [5.0 7.0])] 3 ['(3 [4.5 5.0])] 2 ['(2 [3.5 4.5])]}))))

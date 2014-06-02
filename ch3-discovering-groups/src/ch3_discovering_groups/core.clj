@@ -57,3 +57,6 @@
 
 (defn make-kclusters [k data]
   (take k (repeatedly (fn [] (calc-kcluster (make-ranges data))))))
+
+(defn group-by-cluster [clusters data]
+  (group-by first (partition 2 (interleave clusters data))))
