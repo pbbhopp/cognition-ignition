@@ -69,3 +69,10 @@
 
 (defn mov-avgs [kgroups kclusters]
   (map-indexed #(if (contains? kgroups %1) (mov-avg %1 kgroups) %2) kclusters))
+
+(defn kmean [data]
+  (fn [[kcluster bestmatch]]
+    (let [new-kclust   (mov-avgs (group-by-cluster bestmatch data) kcluster)
+          bettermatch  (find-closet-centroids new-kclust data)]
+      [new-kclust bettermatch])))
+

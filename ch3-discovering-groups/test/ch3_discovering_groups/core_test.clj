@@ -51,14 +51,5 @@
   (testing "hackery kmeans test major refactor later"
     (let [rows [[1.0 1.0] [1.5 2.0] [3.0 4.0] [5.0 7.0] [3.5 5.0] [4.5 5.0] [3.5 4.5]]
           kc1  '((4.963488708361788 3.015060941045377) (4.551427069718808 4.1892221931742535) (2.1511313835837096 6.371573143944422) (4.6161749317250855 6.6981062862404475))        
-          bm1  (find-closet-centroids kc1 rows)
-          kc2  (mov-avgs (group-by-cluster bm1 rows) kc1)
-          bm2  (find-closet-centroids kc2 rows)
-          kc3  (mov-avgs (group-by-cluster bm2 rows) kc2)
-          bm3  (find-closet-centroids kc2 rows)
-          kc4  (mov-avgs (group-by-cluster bm3 rows) kc3)
-          bm4  (find-closet-centroids kc3 rows)
-          kc5  (mov-avgs (group-by-cluster bm4 rows) kc4)
-          bm5  (find-closet-centroids kc4 rows)]
-      (is (= bm4 bm5)) ;; should have converge at this point
-      (is (= bm5 '(0 2 2 2 2 3 2))))))
+          bm1  (find-closet-centroids kc1 rows)]
+      (is (= (get (last (take 99 (iterate (kmean rows) [kc1 bm1]))) 1) '(0 2 2 2 2 2 2))))))
