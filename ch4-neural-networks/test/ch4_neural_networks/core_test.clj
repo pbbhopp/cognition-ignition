@@ -2,6 +2,9 @@
   (:require [clojure.test :refer :all]
             [ch4-neural-networks.core :refer :all]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(deftest make-neural-network-test
+  (testing "making an initial statw neural network"
+    (let [nn (make-neural-network 2 2 1)]
+      (is (= (:hidden-activ nn) [1 1]))
+      (is (= (:input-activ nn) [1 1]))
+      (is (= (:output-activ nn) [1])))))
