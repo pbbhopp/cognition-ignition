@@ -20,3 +20,6 @@
    :output-nodes output-nodes 
    :input-weights  (make-matrix input-nodes hidden-nodes rnd) 
    :output-weights (make-matrix hidden-nodes output-nodes rnd)})
+
+(defn activate-input [in-act input] 
+  (into input (subvec in-act (count input))))
