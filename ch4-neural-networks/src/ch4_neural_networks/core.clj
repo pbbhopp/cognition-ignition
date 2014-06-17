@@ -10,8 +10,8 @@
   (vec (take rows (repeat (repeat-vector cols val-fn)))))
 
 (defn make-neural-network [input-nodes hidden-nodes output-nodes]
-  {:hidden-activ (repeat-vector hidden-nodes 1) 
-   :input-activ  (repeat-vector input-nodes 1)
+  {:hidden-activ (repeat-vector (+ 1 hidden-nodes) 1) 
+   :input-activ  (repeat-vector (+ 1 input-nodes) 1)
    :output-activ (repeat-vector output-nodes 1) 
    :in-weight-diff  (make-matrix input-nodes hidden-nodes #(0)) 
    :out-weight-diff (make-matrix hidden-nodes output-nodes #(0))
@@ -23,3 +23,7 @@
 
 (defn activate-input [in-act input] 
   (into input (subvec in-act (count input))))
+
+(defn activate-inputs [neural-network inputs] 
+  (let [input-activations (mapv #(activate-input (:input-activ neural-network) (first %)) inputs)]
+    (assoc neural-network :input-activ input-activations)))
