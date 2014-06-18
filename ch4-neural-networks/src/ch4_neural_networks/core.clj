@@ -29,3 +29,5 @@
     (assoc neural-network :input-activ input-activations)))
 
 (def sigmoid (fn [x] (Math/tanh x)))
+
+(def sigmoid-derivative (fn [y] (- 1.0 (* y y))))
