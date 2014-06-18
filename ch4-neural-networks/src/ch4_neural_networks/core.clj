@@ -27,3 +27,5 @@
 (defn activate-inputs [neural-network inputs] 
   (let [input-activations (mapv #(activate-input (:input-activ neural-network) (first %)) inputs)]
     (assoc neural-network :input-activ input-activations)))
+
+(def sigmoid (fn [x] (Math/tanh x)))
