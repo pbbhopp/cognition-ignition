@@ -27,4 +27,4 @@
 
 (deftest activate-hidden-node-test
   (testing "find acivation value for a single hidden node"
-    (is (= (activate-hidden-node [5 7 9] [1 0 1]) 14))))
+    (is (= (activate-hidden-node [5 7 9] [1 0 1]) 0.9999999999986171))))

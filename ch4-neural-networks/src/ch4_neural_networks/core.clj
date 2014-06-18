@@ -28,10 +28,11 @@
   (let [input-activations (mapv #(activate-input (:input-activ neural-network) (first %)) inputs)]
     (assoc neural-network :input-activ input-activations)))
 
-(def sigmoid (fn [x] (Math/tanh x)))
+(defn sigmoid [x] (Math/tanh x))
 
-(def sigmoid-derivative (fn [y] (- 1.0 (* y y))))
+(defn sigmoid-derivative [y] (- 1.0 (* y y)))
 
 (defn activate-hidden-node [input-node weight-node]
-  (let [add-coll (partition 2 (interleave input-node weight-node))]
-    (reduce + (map #(* (first %) (second %)) add-coll))))
+  (let [add-coll (partition 2 (interleave input-node weight-node))
+        total    (reduce + (map #(* (first %) (second %)) add-coll))]
+    (sigmoid total)))
