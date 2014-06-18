@@ -24,3 +24,7 @@
     (let [nn1 (make-neural-network 2 2 1)
           nn2 (activate-inputs nn1 training-input)]
       (is (= (:input-activ nn2) [[0 0 1] [0 1 1] [1 0 1] [1 1 1]])))))
+
+(deftest activate-hidden-node-test
+  (testing "find acivation value for a single hidden node"
+    (is (= (activate-hidden-node [5 7 9] [1 0 1]) 14))))

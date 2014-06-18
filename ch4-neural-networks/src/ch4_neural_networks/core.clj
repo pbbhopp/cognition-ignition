@@ -31,3 +31,7 @@
 (def sigmoid (fn [x] (Math/tanh x)))
 
 (def sigmoid-derivative (fn [y] (- 1.0 (* y y))))
+
+(defn activate-hidden-node [input-node weight-node]
+  (let [add-coll (partition 2 (interleave input-node weight-node))]
+    (reduce + (map #(* (first %) (second %)) add-coll))))
