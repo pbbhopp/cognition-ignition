@@ -36,3 +36,6 @@
         total    (reduce + (map #(* (first %) (second %)) add-coll))]
     (sigmoid total)))
 
+(defn update [neural-network train-data]
+  neural-network)
+
