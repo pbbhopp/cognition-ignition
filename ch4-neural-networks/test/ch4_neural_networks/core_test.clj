@@ -30,8 +30,9 @@
 
 (deftest update-test
   (testing "update neural network for given training inputs"
-    (let [nn (make-neural-network 2 2 1)]
+    (let [nn (make-neural-network 2 2 1)
+           _ (println @nn)]
       (update nn training-input)
       (is (= (:input-activ @nn) [0 0 1]))
-      (is (= (:hidden-activ-activ @nn) [0.5135924495204157 -0.37426574501728027 1.0]))
-      (is (= (:output-activ-activ-activ @nn) [-0.2074094931212734])))))
+      (is (= (:hidden-activ @nn) [0.5135924495204157 -0.37426574501728027 1.0]))
+      (is (= (:output-activ @nn) [-0.2074094931212734])))))

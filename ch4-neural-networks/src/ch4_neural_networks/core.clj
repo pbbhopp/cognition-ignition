@@ -1,7 +1,7 @@
 (ns ch4-neural-networks.core)
 
-(defn repeat-vector [num val]
-  (vec (take num (repeat val))))
+(defn repeat-vector [n val-fn]
+  (vec (take n (repeatedly val-fn))))
 
 (defn rnd [a b]
   (+ (* (- b a) (rand)) a))
@@ -18,8 +18,8 @@
          :hidden-nodes (+ 1 hidden-nodes) 
          :input-nodes  (+ 1 input-nodes) 
          :output-nodes output-nodes 
-         :input-weights  (make-matrix input-nodes hidden-nodes rnd) 
-         :output-weights (make-matrix hidden-nodes output-nodes rnd)}))
+         :input-weights  (make-matrix input-nodes hidden-nodes #(rnd -1 1)) 
+         :output-weights (make-matrix hidden-nodes output-nodes #(rnd -1 1))}))
 
 (defn activate-input [in-act input] 
   (into input (subvec in-act (count input))))
@@ -36,6 +36,16 @@
         total    (reduce + (map #(* (first %) (second %)) add-coll))]
     (sigmoid total)))
 
-(defn update [neural-network train-data]
-  neural-network)
+(defn activate-nodes [node-layer nodes]
+  (let [weight-nodes (partition (count nodes) (apply interleave nodes))]
+    (mapv #(activate-node node-layer %) weight-nodes)))
 
+(defn update [neural-network train-data]
+  (let [in-act  (:input-activ @neural-network)
+        hid-act (:hidden-activ @neural-network)
+        out-act (:output-activ @neural-network)
+        wi      (:input-weights @neural-network)
+        wo      (:output-weights @neural-network)]
+    (swap! neural-network assoc :input-activ (activate-input in-act (last (first train-data))))
+    (swap! neural-network assoc :hidden-activ (activate-nodes hid-act wi))
+    (swap! neural-network assoc :output-activ-activ (activate-nodes out-act wo))))
