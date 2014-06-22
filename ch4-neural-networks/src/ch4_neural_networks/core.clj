@@ -21,8 +21,11 @@
          :input-weights  (make-matrix input-nodes hidden-nodes rnd)
          :output-weights (make-matrix hidden-nodes output-nodes rnd)}))
 
+(defn cover [over under]
+  (into over (subvec under (count over))))
+
 (defn activate-input [in-act input]
-  (into input (subvec (first in-act) (count input))))
+  (cover input (first in-act)))
 
 (defn activate-inputs [neural-network inputs]
   (mapv #(activate-input (:input-activ @neural-network) (first %)) inputs))
@@ -47,5 +50,5 @@
         wi      (:input-weights @neural-network)
         wo      (:output-weights @neural-network)]
     (swap! neural-network assoc :input-activ [(activate-input in-act (first (first train-data)))])
-    (swap! neural-network assoc :hidden-activ (activate-nodes in-act (mapv drop-last wi)))
-    (swap! neural-network assoc :output-activ (activate-nodes out-act wo))))
+    (swap! neural-network assoc :hidden-activ [(cover (activate-nodes in-act (mapv drop-last wi)) (first hid-act))]) 
+    (swap! neural-network assoc :output-activ [(activate-nodes out-act wo)])))

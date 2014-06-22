@@ -28,5 +28,5 @@
       (swap! nn assoc :output-weights wo)
       (swap! nn assoc :input-activ [[0 0 1]])
       (update nn training-input)
-      (is (= (:hidden-activ @nn) [0.5135924495204157 -0.37426574501728027]))
+      (is (= (:hidden-activ @nn) [[0.5135924495204157 -0.37426574501728027 1]]))
       (is (= (:output-activ @nn) [[-0.2074094931212734]])))))
