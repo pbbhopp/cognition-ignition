@@ -48,4 +48,4 @@
         wo      (:output-weights @neural-network)]
     (swap! neural-network assoc :input-activ [(activate-input in-act (first (first train-data)))])
     (swap! neural-network assoc :hidden-activ (activate-nodes in-act (mapv drop-last wi)))
-    (swap! neural-network assoc :output-activ-activ (activate-nodes out-act wo))))
+    (swap! neural-network assoc :output-activ (activate-nodes out-act wo))))
