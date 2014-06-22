@@ -34,14 +34,14 @@
 
 (defn sigmoid-derivative [y] (- 1.0 (* y y)))
 
-(defn activate-node [input-node weight-node]
+(defn activate-node [input-node weight-node act-fn]
   (let [add-coll (partition 2 (interleave (first input-node) weight-node))
         total    (reduce + (map #(* (first %) (second %)) add-coll))]
-    (sigmoid total)))
+    (act-fn total)))
 
-(defn activate-nodes [node-layer nodes]
+(defn activate-nodes [node-layer nodes act-fn]
   (let [weight-nodes (partition (count nodes) (apply interleave nodes))]
-    (mapv #(activate-node node-layer %) weight-nodes)))
+    (mapv #(activate-node node-layer % act-fn) weight-nodes)))
 
 (defn update [neural-network train-data]
   (let [in-act  (:input-activ @neural-network)
@@ -50,5 +50,5 @@
         wi      (:input-weights @neural-network)
         wo      (:output-weights @neural-network)]
     (swap! neural-network assoc :input-activ [(activate-input in-act (first (first train-data)))])
-    (swap! neural-network assoc :hidden-activ [(cover (activate-nodes in-act (mapv drop-last wi)) (first hid-act))]) 
-    (swap! neural-network assoc :output-activ [(activate-nodes out-act wo)])))
+    (swap! neural-network assoc :hidden-activ [(cover (activate-nodes in-act (mapv drop-last wi) sigmoid) (first hid-act))])
+    (swap! neural-network assoc :output-activ [(activate-nodes (:hidden-activ @neural-network) wo (fn [x] x))])))
