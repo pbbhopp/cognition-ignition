@@ -30,3 +30,8 @@
       (update nn training-input)
       (is (= (:hidden-activ @nn) [[0.5135924495204157 -0.37426574501728027 1]]))
       (is (= (:output-activ @nn) [[-0.2104628626433524]])))))
+
+(deftest back-propagate-test
+  (testing "back propagating neural network"
+    (let [nn (make-neural-network 2 2 1)]
+      (is (= (back-propagate nn 0.5 0.1 [0]) [0.1984870068082006])))))
