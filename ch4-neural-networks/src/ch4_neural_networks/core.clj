@@ -53,9 +53,13 @@
     (swap! neural-network assoc :hidden-activ [(cover (activate-nodes in-act (mapv drop-last wi) sigmoid) (first hid-act))])
     (swap! neural-network assoc :output-activ [(activate-nodes (:hidden-activ @neural-network) wo (fn [x] x))])))
 
-(defn back-propagate [neural-network target learning-rate momentum-factor]
-  (let [substract-coll (partition 2 (interleave target (first (:output-activ @neural-network))))
+(defn calc-error-output [target outputs]
+  (let [substract-coll (partition 2 (interleave target (first outputs)))
         output-diffs   (mapv #(- (first %) (second %)) substract-coll)
-        mult-coll      (partition 2 (interleave output-diffs (first (:output-activ @neural-network))))
-        output-deltas  (mapv #(* (first %) (sigmoid-derivative (second %))) mult-coll)]
+        mult-coll      (partition 2 (interleave output-diffs (first outputs)))]
+    (mapv #(* (first %) (sigmoid-derivative (second %))) mult-coll)))
+
+(defn back-propagate [neural-network target learning-rate momentum-factor]
+  (let [output-deltas (calc-error-output target (:output-activ @neural-network))]
     output-deltas))
+
