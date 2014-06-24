@@ -62,4 +62,3 @@
 (defn back-propagate [neural-network target learning-rate momentum-factor]
   (let [output-deltas (calc-error-output target (:output-activ @neural-network))]
     output-deltas))
-
