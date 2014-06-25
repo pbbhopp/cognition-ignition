@@ -59,6 +59,14 @@
         mult-coll      (partition 2 (interleave output-diffs (first outputs)))]
     (mapv #(* (first %) (sigmoid-derivative (second %))) mult-coll)))
 
+(defn calc-error-hidden [output-deltas out-weights hidden-layer]
+  (let [sum-coll  (map #(interleave (first %) (second %)) (partition 2 (interleave (take 3 (repeat output-deltas)) out-weights)))
+        error     (reduce (fn [sum el] (+ sum (* (first el) (second el)))) 0 sum-coll)
+        mult-coll (partition 2 (interleave [error error error] out-weights))
+        errors    (partition 2 (interleave (mapv #(* (first %) (first (second %))) mult-coll) (first hidden-layer)))]
+    (mapv #(* (first %) (sigmoid-derivative (second %))) errors)))
+
 (defn back-propagate [neural-network target learning-rate momentum-factor]
-  (let [output-deltas (calc-error-output target (:output-activ @neural-network))]
-    output-deltas))
+  (let [output-deltas (calc-error-output target (:output-activ @neural-network))
+        hidden-deltas (calc-error-hidden output-deltas (:output-weights @neural-network) (:hidden-activ @neural-network))]
+    hidden-deltas))
