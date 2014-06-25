@@ -38,4 +38,4 @@
       (swap! nn assoc :output-weights wo)
       (swap! nn assoc :input-activ [[0 0 1]])
       (update nn training-input)
-      (is (= (back-propagate nn [0] 0.5 0.1) [0.02436934476223628, 0.13931665451540176, 0.0])))))
+      (is (= (back-propagate nn [0] 0.5 0.1) [0.024506544797666605 0.14010101085005247 0.0])))))
