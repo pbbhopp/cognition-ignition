@@ -67,7 +67,7 @@
     (mapv #(* (first %) (sigmoid-derivative (second %))) errors)))
 
 (defn update-weights [deltas weights layer rate factor]
-  (let [deltas (take (count (first layer)) (repeat (first deltas)))
+  (let [deltas    (take (count (first layer)) (repeat (first deltas)))
         mult-coll (partition 2 (interleave deltas (first layer)))
         changes   (mapv #(* (first %) (second %)) mult-coll)
         sums-coll (partition 3 (interleave (mapv #(first %) weights) (mapv #(* rate %) changes) (mapv #(* factor %) changes)))
@@ -75,8 +75,17 @@
     (cover (subvec sums 0 (count layer)) (mapv #(first %) weights))))
 
 (defn back-propagate [neural-network target learning-rate momentum-factor]
-  (let [output-deltas (calc-error-output target (:output-activ @neural-network))
-        hidden-deltas (calc-error-hidden output-deltas (:output-weights @neural-network) (:hidden-activ @neural-network))
-        out-weights   (update-weights output-deltas (:output-weights @neural-network) (:hidden-activ @neural-network) learning-rate momentum-factor)]
-    out-weights))
+  (let [{oa :output-activ
+         ow :output-weights
+         od :out-weight-diff
+         ia :input-activ
+         iw :input-weights
+         id :in-weight-diff
+         ha :hidden-activ}  @neural-network
+        output-deltas       (calc-error-output target oa)
+        hidden-deltas       (calc-error-hidden output-deltas ow ha)
+        out-weights         (update-weights output-deltas ow ha learning-rate momentum-factor)
+        in-weights-layered  (map #(map vector %) iw)
+        in-weights          (mapv #(update-weights hidden-deltas % ia learning-rate momentum-factor) in-weights-layered)]
+    in-weights))
 
