@@ -1,4 +1,5 @@
-(ns ch4-neural-networks.core)
+(ns ch4-neural-networks.core
+  (:require [clojure.math.numeric-tower :as math]))
 
 (defn repeat-vector [n val-fn]
   (vec (take n (repeatedly val-fn))))
@@ -74,6 +75,10 @@
         sums      (mapv #(+ (first %) (second %) (nth % 2)) sums-coll)]
     (cover (subvec sums 0 (count layer)) (mapv #(first %) weights))))
 
+(defn error-propagate [target out-act]
+  (let [subt-coll (partition 2 (interleave target (first out-act)))]
+    (reduce (fn [sum els] (+ sum (* 0.5 (math/expt (- (first els) (second els)) 2)))) 0 subt-coll)))
+
 (defn back-propagate [neural-network target learning-rate momentum-factor]
   (let [{oa :output-activ
          ow :output-weights
@@ -86,6 +91,7 @@
         hidden-deltas       (calc-error-hidden output-deltas ow ha)
         out-weights         (update-weights output-deltas ow ha learning-rate momentum-factor)
         in-weights-layered  (map #(map vector %) iw)
-        in-weights          (mapv #(update-weights hidden-deltas % ia learning-rate momentum-factor) in-weights-layered)]
-    in-weights))
+        in-weights          (mapv #(update-weights hidden-deltas % ia learning-rate momentum-factor) in-weights-layered)
+        error               (error-propagate target oa)]
+    error))
 
