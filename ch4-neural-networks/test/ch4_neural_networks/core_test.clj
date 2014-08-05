@@ -30,7 +30,7 @@
 
 (swap! neural-network assoc :output-weights wo)
 
-(deftest make-neural-network-test
+(deftest feed-forward-test
   (testing "feed forward activating nodes in neural network"
     (feed-forward neural-network [0 0])
     (is (= (:hidden-nodes @neural-network) [[0.5135924495204157 -0.37426574501728027 1]]))
