@@ -22,4 +22,13 @@
 (def wo [[0.1667640789100624] [0.8162257703906703] [0.009373711634780513]])
 
 (deftest activate-nodes-test
-  (is (= (activate-nodes [0 0 1] wi) [0.5135924495204157 -0.37426574501728027 -0.046771940534449614])))
+  (is (= (activate-nodes [0 0 1] wi sigmoid) [0.5135924495204157 -0.37426574501728027 -0.046771940534449614])))
+
+(def neural-network (make-neural-network 2 2 1))
+
+(swap! neural-network assoc :input-weights wi)
+
+(deftest make-neural-network-test
+  (testing "feed forward activating nodes in neural network"
+    (feed-forward neural-network [0 0])
+    (is (= (:hidden-nodes @neural-network) [[0.5135924495204157 -0.37426574501728027 1]]))))

@@ -17,9 +17,6 @@
          :input-weights  (make-matrix input-nodes hidden-nodes rnd)
          :output-weights (make-matrix hidden-nodes output-nodes rnd)}))
 
-(defn cover [over under]
-  (into over (subvec under (count over))))
-
 (defn transpose [coll]
   (apply map vector coll))
 
@@ -34,9 +31,25 @@
 
 (defn sigmoid-derivative [y] (- 1.0 (* y y)))
 
-(defn activate-nodes [nodes weights]
+(defn activate-nodes [nodes weights f]
   (let [weights (transpose weights)
         mults   (map #(group-by-multiply nodes %) weights) 
         sums    (group-by-summation mults)]
-    (mapv #(sigmoid %) sums)))
+    (mapv #(f %) sums)))
 
+(defn replace-tail [with-old-tail with-new-tail]
+  (into (vec (butlast with-old-tail)) (vector (last with-new-tail))))
+
+(defn add-tail [tail-less with-tail]
+  (into tail-less (vector (last with-tail))))
+
+(defn feed-forward [neural-network input]
+  (let [ins  (first (:input-nodes @neural-network))
+        tri  (add-tail input ins)
+        hids (:hidden-nodes @neural-network)
+        outs (:output-nodes @neural-network)
+        iw   (:input-weights @neural-network)
+        ow   (:output-weights @neural-network)]
+    (swap! neural-network assoc :hidden-nodes [(replace-tail (activate-nodes tri iw sigmoid) ins)])))
+
+;ao [-0.2074094931212734]
