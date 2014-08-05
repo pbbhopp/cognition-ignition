@@ -35,3 +35,14 @@
     (feed-forward neural-network [0 0])
     (is (= (:hidden-nodes @neural-network) [[0.5135924495204157 -0.37426574501728027 1]]))
     (is (= (:output-nodes @neural-network) [[-0.20740949312127344]]))))
+
+(deftest back-propagate-test
+  (testing "back propogation in neural network to find errors"
+    (is (= (back-propagate neural-network [0] 0.5 0.1) [0.19848700680820064]))))
+
+;output-deltas = [0.1984870068082006]
+;hidden-deltas = [0.02436934476223628 0.13931665451540176 0.0]
+;output-weights = [[0.21773479292236197] [0.7790823266510097] [0.10861721503888082]]
+;input-weights = [[ 0.6888437030500962  0.515908805880605   -0.15885683833831]
+;                 [-0.4821664994140733  0.02254944273721704 -0.19013172509917142] 
+;                 [ 0.5797818504506633 -0.3237162205844442  -0.04680609169528838]]
