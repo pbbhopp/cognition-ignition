@@ -22,3 +22,21 @@
 
 (defn transpose [coll]
   (apply map vector coll))
+
+(defn group-by-summation [coll] 
+  (map #(reduce + %) coll))
+
+(defn group-by-multiply [& colls]
+  (let [coll (partition (count colls) (apply interleave colls))]
+    (map #(reduce * %) coll)))
+
+(defn sigmoid [x] (Math/tanh x))
+
+(defn sigmoid-derivative [y] (- 1.0 (* y y)))
+
+(defn activate-nodes [nodes weights]
+  (let [weights (transpose weights)
+        mults   (map #(group-by-multiply nodes %) weights) 
+        sums    (group-by-summation mults)]
+    (mapv #(sigmoid %) sums)))
+
