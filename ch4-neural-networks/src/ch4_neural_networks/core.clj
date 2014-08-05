@@ -29,7 +29,7 @@
 
 (defn sigmoid [x] (Math/tanh x))
 
-(defn sigmoid-derivative [y] (- 1.0 (* y y)))
+(defn dsigmoid [y] (- 1.0 (* y y)))
 
 (defn activate-nodes [nodes weights f]
   (let [weights (transpose weights)
@@ -51,3 +51,17 @@
       [(replace-tail (activate-nodes train in-ws sigmoid) (first (:input-nodes @neural-network)))])
     (swap! neural-network assoc :output-nodes 
       [(activate-nodes (first (:hidden-nodes @neural-network)) out-ws sigmoid)])))
+
+(defn errors-for-nodes [nodes error-factors]
+  (let [coll (partition 2 (interleave nodes error-factors))]
+    (map #(* (dsigmoid (first %)) (second %)) coll)))
+
+(defn update-weights [nodes weights deltas ]
+  )
+
+(defn back-propagate [neural-network targets learning-rate momentum-factor]
+  (let [out-nodes     (first (:output-nodes @neural-network))
+        output-deltas (apply map - [targets out-nodes])
+        output-errors (errors-for-nodes out-nodes output-deltas);]
+        _ (println output-errors)]
+    (vec output-errors)))
