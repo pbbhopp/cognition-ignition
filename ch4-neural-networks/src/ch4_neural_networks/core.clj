@@ -44,12 +44,10 @@
   (into tail-less (vector (last with-tail))))
 
 (defn feed-forward [neural-network input]
-  (let [ins  (first (:input-nodes @neural-network))
-        tri  (add-tail input ins)
-        hids (:hidden-nodes @neural-network)
-        outs (:output-nodes @neural-network)
-        iw   (:input-weights @neural-network)
-        ow   (:output-weights @neural-network)]
-    (swap! neural-network assoc :hidden-nodes [(replace-tail (activate-nodes tri iw sigmoid) ins)])))
-
-;ao [-0.2074094931212734]
+  (let [train  (add-tail input (first (:input-nodes @neural-network)))
+        in-ws  (:input-weights @neural-network)
+        out-ws (:output-weights @neural-network)]
+    (swap! neural-network assoc :hidden-nodes 
+      [(replace-tail (activate-nodes train in-ws sigmoid) (first (:input-nodes @neural-network)))])
+    (swap! neural-network assoc :output-nodes 
+      [(activate-nodes (first (:hidden-nodes @neural-network)) out-ws sigmoid)])))
