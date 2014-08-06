@@ -62,6 +62,9 @@
 (defn back-propagate [neural-network targets learning-rate momentum-factor]
   (let [out-nodes     (first (:output-nodes @neural-network))
         output-deltas (apply map - [targets out-nodes])
-        output-errors (errors-for-nodes out-nodes output-deltas);]
-        _ (println output-errors)]
-    (vec output-errors)))
+        output-errors (errors-for-nodes out-nodes output-deltas)
+        hidden-deltas (map #(group-by-multiply output-errors %) (:output-weights @neural-network))
+        hid-nodes     (first (:hidden-nodes @neural-network))
+        hidden-errors (errors-for-nodes hid-nodes (map #(first %) hidden-deltas))
+        _ (println hidden-errors)]
+    (vec hidden-errors)))
