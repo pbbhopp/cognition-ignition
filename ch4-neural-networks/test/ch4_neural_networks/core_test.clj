@@ -38,7 +38,7 @@
 
 (deftest back-propagate-test
   (testing "back propogation in neural network to find errors"
-    (is (= (back-propagate neural-network [0] 0.5 0.1) [0.19848700680820064]))))
+    (is (= (back-propagate neural-network [0] 0.5 0.1) [0.024369344762236282 0.13931665451540176 0.0]))))
 
 ;output-deltas = [0.1984870068082006]
 ;hidden-deltas = [0.02436934476223628 0.13931665451540176 0.0]
