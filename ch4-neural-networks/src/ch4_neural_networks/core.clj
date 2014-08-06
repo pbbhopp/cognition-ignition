@@ -20,7 +20,7 @@
 (defn transpose [coll]
   (apply map vector coll))
 
-(defn group-by-summation [coll]
+(defn sum-by-group [coll]
   (map #(reduce + %) coll))
 
 (defn group-by-multiply [& colls]
@@ -34,7 +34,7 @@
 (defn activate-nodes [nodes weights f]
   (let [weights (transpose weights)
         mults   (map #(group-by-multiply nodes %) weights)
-        sums    (group-by-summation mults)]
+        sums    (sum-by-group mults)]
     (mapv #(f %) sums)))
 
 (defn replace-tail [with-old-tail with-new-tail]
@@ -56,13 +56,13 @@
   (let [coll (partition 2 (interleave nodes error-factors))]
     (map #(* (dsigmoid (first %)) (second %)) coll)))
 
-(defn update-weights [nodes weights errors rate factor]
+(defn update-weights [nodes weights errors rate]
   (let [changes (map #(map (fn [error] (* error %)) errors) nodes)
         rates   (map #(vector (* rate (first %))) changes)
         coll    (map interleave rates weights)]
     (map #(+ (first %) (second %)) coll)))
 
-(defn back-propagate [neural-network targets learning-rate momentum-factor]
+(defn back-propagate [neural-network targets learning-rate]
   (let [output-nodes   (first (:output-nodes @neural-network))
         output-deltas  (apply map - [targets output-nodes])
         output-errors  (errors-for-nodes output-nodes output-deltas)
@@ -70,7 +70,7 @@
         hidden-nodes   (first (:hidden-nodes @neural-network))
         hidden-errors  (errors-for-nodes hidden-nodes (map #(first %) hidden-deltas))
         output-weights (:output-weights @neural-network)
-        new-weights    (update-weights hidden-nodes output-weights output-errors learning-rate momentum-factor)
+        new-weights    (update-weights hidden-nodes output-weights output-errors learning-rate)
         ];_ (println changes)]
     (vec new-weights)))
 
