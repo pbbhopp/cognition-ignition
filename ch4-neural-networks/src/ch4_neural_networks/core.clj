@@ -20,7 +20,7 @@
 (defn transpose [coll]
   (apply map vector coll))
 
-(defn group-by-summation [coll] 
+(defn group-by-summation [coll]
   (map #(reduce + %) coll))
 
 (defn group-by-multiply [& colls]
@@ -33,7 +33,7 @@
 
 (defn activate-nodes [nodes weights f]
   (let [weights (transpose weights)
-        mults   (map #(group-by-multiply nodes %) weights) 
+        mults   (map #(group-by-multiply nodes %) weights)
         sums    (group-by-summation mults)]
     (mapv #(f %) sums)))
 
@@ -47,24 +47,30 @@
   (let [train  (add-tail input (first (:input-nodes @neural-network)))
         in-ws  (:input-weights @neural-network)
         out-ws (:output-weights @neural-network)]
-    (swap! neural-network assoc :hidden-nodes 
+    (swap! neural-network assoc :hidden-nodes
       [(replace-tail (activate-nodes train in-ws sigmoid) (first (:input-nodes @neural-network)))])
-    (swap! neural-network assoc :output-nodes 
+    (swap! neural-network assoc :output-nodes
       [(activate-nodes (first (:hidden-nodes @neural-network)) out-ws sigmoid)])))
 
 (defn errors-for-nodes [nodes error-factors]
   (let [coll (partition 2 (interleave nodes error-factors))]
     (map #(* (dsigmoid (first %)) (second %)) coll)))
 
-(defn update-weights [nodes weights deltas ]
-  )
+(defn update-weights [nodes weights errors rate factor]
+  (let [changes (map #(map (fn [error] (* error %)) errors) nodes)
+        rates   (map #(vector (* rate (first %))) changes)
+        coll    (map interleave rates weights)]
+    (map #(+ (first %) (second %)) coll)))
 
 (defn back-propagate [neural-network targets learning-rate momentum-factor]
-  (let [out-nodes     (first (:output-nodes @neural-network))
-        output-deltas (apply map - [targets out-nodes])
-        output-errors (errors-for-nodes out-nodes output-deltas)
-        hidden-deltas (map #(group-by-multiply output-errors %) (:output-weights @neural-network))
-        hid-nodes     (first (:hidden-nodes @neural-network))
-        hidden-errors (errors-for-nodes hid-nodes (map #(first %) hidden-deltas))
-        _ (println hidden-errors)]
-    (vec hidden-errors)))
+  (let [output-nodes   (first (:output-nodes @neural-network))
+        output-deltas  (apply map - [targets output-nodes])
+        output-errors  (errors-for-nodes output-nodes output-deltas)
+        hidden-deltas  (map #(group-by-multiply output-errors %) (:output-weights @neural-network))
+        hidden-nodes   (first (:hidden-nodes @neural-network))
+        hidden-errors  (errors-for-nodes hidden-nodes (map #(first %) hidden-deltas))
+        output-weights (:output-weights @neural-network)
+        new-weights    (update-weights hidden-nodes output-weights output-errors learning-rate momentum-factor)
+        ];_ (println changes)]
+    (vec new-weights)))
+
