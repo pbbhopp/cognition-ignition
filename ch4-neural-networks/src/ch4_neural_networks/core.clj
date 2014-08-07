@@ -65,9 +65,12 @@
 (defn vec-colls-in-coll [coll]
    (vec (map vec coll)))
 
-(defn back-propagate [neural-network targets learning-rate]
+(defn cover [over under]
+  (into over (subvec under (count over))))
+
+(defn back-propagate [neural-network train learning-rate]
   (let [output-nodes   (first (:output-nodes @neural-network))
-        output-deltas  (apply map - [targets output-nodes])
+        output-deltas  (apply map - [(second train) output-nodes])
         output-errors  (errors-for-nodes output-nodes output-deltas)
         hidden-deltas  (map #(group-by-multiply output-errors %) (:output-weights @neural-network))
         hidden-nodes   (first (:hidden-nodes @neural-network))
@@ -76,6 +79,8 @@
         input-nodes    (first (:input-nodes @neural-network))
         input-weights  (:input-weights @neural-network)
         in-weights     (update-weights hidden-nodes output-weights output-errors learning-rate)
+        input-nodes    (cover (first train) input-nodes)
         out-weights    (update-weights input-nodes input-weights hidden-errors learning-rate)]
-    (vec-colls-in-coll in-weights)))
+    (swap! neural-network assoc :input-weights (vec-colls-in-coll in-weights))
+    (swap! neural-network assoc :output-weights (vec-colls-in-coll out-weights))))
 
