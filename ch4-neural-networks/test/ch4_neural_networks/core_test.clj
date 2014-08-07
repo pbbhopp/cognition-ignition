@@ -39,7 +39,7 @@
 (deftest back-propagate-test
   (testing "back propogation in neural network to find errors"
     (is (= (back-propagate neural-network [0] 0.5) 
-      [0.217734792922362 0.7790823266510097 0.10861721503888083]))))
+      [[0.217734792922362] [0.7790823266510097] [0.10861721503888083]]))))
 
 ;output-weights = [[0.21773479292236197] [0.7790823266510097] [0.10861721503888082]]
 ;input-weights = [[ 0.6888437030500962  0.515908805880605   -0.15885683833831]

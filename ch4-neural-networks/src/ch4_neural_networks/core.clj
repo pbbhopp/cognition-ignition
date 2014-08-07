@@ -57,10 +57,13 @@
     (map #(* (dsigmoid (first %)) (second %)) coll)))
 
 (defn update-weights [nodes weights errors rate]
-  (let [changes (map #(map (fn [error] (* error %)) errors) nodes)
-        rates   (map #(vector (* rate (first %))) changes)
-        coll    (map interleave rates weights)]
-    (map #(+ (first %) (second %)) coll)))
+  (let [changes (map #(map (fn [el] (* el %)) errors) nodes)
+        rates   (map #(map (fn [el] (* el rate)) %) changes)
+        coll    (map #(partition 2 %) (apply map interleave [rates weights]))]
+    (map #(map (fn [el] (+ (first el) (second el))) %) coll)))
+
+(defn vec-colls-in-coll [coll]
+   (vec (map vec coll)))
 
 (defn back-propagate [neural-network targets learning-rate]
   (let [output-nodes   (first (:output-nodes @neural-network))
@@ -70,7 +73,9 @@
         hidden-nodes   (first (:hidden-nodes @neural-network))
         hidden-errors  (errors-for-nodes hidden-nodes (map #(first %) hidden-deltas))
         output-weights (:output-weights @neural-network)
-        new-weights    (update-weights hidden-nodes output-weights output-errors learning-rate)
-        ];_ (println changes)]
-    (vec new-weights)))
+        input-nodes    (first (:input-nodes @neural-network))
+        input-weights  (:input-weights @neural-network)
+        in-weights     (update-weights hidden-nodes output-weights output-errors learning-rate)
+        out-weights    (update-weights input-nodes input-weights hidden-errors learning-rate)]
+    (vec-colls-in-coll in-weights)))
 
