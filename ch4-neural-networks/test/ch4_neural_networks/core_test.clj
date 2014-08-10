@@ -2,12 +2,6 @@
   (:require [clojure.test :refer :all]
             [ch4-neural-networks.core :refer :all]))
 
-(def training-input
-  [[[0 0] [0]]
-   [[0 1] [1]]
-   [[1 0] [1]]
-   [[1 1] [0]]])
-
 (deftest make-neural-network-test
   (testing "making an initial state neural network"
     (let [nn (make-neural-network 2 2 1)]
@@ -45,3 +39,22 @@
       [[ 0.6888437030500962  0.515908805880605   -0.15885683833831] 
        [-0.4821664994140733  0.02254944273721704 -0.19013172509917142] 
        [ 0.5797818504506633 -0.3237162205844442  -0.04680609169528838]]))))
+
+(def training-input
+  [[[0 0] [0]]
+   [[0 1] [1]]
+   [[1 0] [1]]
+   [[1 1] [0]]])
+
+(deftest training-test
+  (testing "training of neural network with full training data set"
+    (let [nnet (make-neural-network 2 2 1)]
+      (swap! nnet assoc :input-weights wi)
+      (swap! nnet assoc :output-weights wo)
+      (train nnet training-input 0.5)
+      (is (= (:input-weights @nnet) 
+        [[0.21650107466220375] [0.5578574104610892] [0.5785890097427964]]))
+      (is (= (:output-weights @nnet) 
+        [[ 0.6787406035661884  0.5012396912570095  -0.15885683833831]
+         [-0.37647384745464746 0.3843265480669719  -0.19013172509917142] 
+         [ 0.68691868299303    0.04891969157308979 -0.04680609169528838]])))))

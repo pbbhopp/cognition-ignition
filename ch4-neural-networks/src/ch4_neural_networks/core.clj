@@ -84,3 +84,7 @@
     (swap! neural-network assoc :input-weights (vec-colls-in-coll in-weights))
     (swap! neural-network assoc :output-weights (vec-colls-in-coll out-weights))))
 
+(defn train [neural-network training-data learning-rate]
+  (doseq [train training-data]
+    (feed-forward neural-network (first train))
+    (back-propagate neural-network train learning-rate)))
