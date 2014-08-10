@@ -1,17 +1,17 @@
 (ns ch6-naive-bayes.core)
 
 (defprotocol Filter
-  (increment-feature [data-set feature category])
-  (increment-category [data-set category])
-  (category-count [data-set category])
-  (feature-count [data-set feature category]))
+  (increment-feature [data feature category])
+  (increment-category [data category])
+  (category-count [data category])
+  (feature-count [data feature category]))
 
-(extend-type clojure.lang.PersistentHashSet
+(extend-type clojure.lang.PersistentArrayMap
   Filter
-  (increment-feature [data-set feature category]
-    (let [result  (clojure.set/select #(= (:word %) feature) data-set)
-          updated (merge-with + {:count 1 :c 1} (:counts (first result)))]
-      updated)))
+  (increment-feature [data feature category]
+    (let [result  ((keyword feature) data)
+          updated (merge-with + {:count 1 :c 1} result)]
+      (assoc data :word updated))))
 
 (defprotocol Feature
   (get-words [str]))
