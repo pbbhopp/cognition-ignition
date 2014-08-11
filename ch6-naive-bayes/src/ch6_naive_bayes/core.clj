@@ -2,7 +2,7 @@
 
 (defn increment-feature [data feature category]
   (let [result  ((keyword feature) @data {category 0})
-        updated (merge-with + {(keyword category) 1} result)]
+        updated (merge-with + {category 1} result)]
     (swap! data assoc (keyword feature) updated)))
 
 (defn feature-probability [data feature category]
