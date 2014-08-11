@@ -2,6 +2,9 @@
   (:require [clojure.test :refer :all]
             [ch6-naive-bayes.core :refer :all]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(deftest feature-test
+  (testing "feature increment and probability"
+    (let [counter (increment-feature {:rabbit {:good 2 :bad 3}} "rabbit" :good)
+          prob    (feature-probability {:rabbit {:good 2 :bad 3}} "rabbit" :good)]
+    (is (= counter {:rabbit {:good 3 :bad 3}}))
+    (is (= prob (/ 5 2))))))
