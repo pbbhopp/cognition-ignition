@@ -18,7 +18,7 @@
 
 (extend-type String
   Feature
-  (get-words [str] (apply hash-set (clojure.string/split str #" "))))
+  (get-words [str] (vec (clojure.string/split str #" "))))
 
 (defn train [classifier terms category]
   (doseq [word terms]
