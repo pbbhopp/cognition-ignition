@@ -7,4 +7,4 @@
     (let [counter (increment-feature {:rabbit {:good 2 :bad 3}} "rabbit" :good)
           prob    (feature-probability {:rabbit {:good 2 :bad 3}} "rabbit" :good)]
     (is (= counter {:rabbit {:good 3 :bad 3}}))
-    (is (= prob (/ 5 2))))))
+    (is (= prob (/ 2 5))))))
