@@ -6,7 +6,7 @@
     (swap! data assoc (keyword feature) updated)))
 
 (defn feature-probability [data feature category]
-  (let [result ((keyword feature) data)
+  (let [result ((keyword feature) @data)
         sum    (reduce + (vals result))
         count  (category result)]             
     (if (= count 0)

@@ -15,3 +15,7 @@
   (testing "should track feature counts correctly"
     (is (= (:quick @classifier) {:good 2 :bad 1}))
     (is (= (:jumps @classifier) {:good 2}))))
+
+(deftest feature-count-test
+  (testing "should calculate feature probability correctly"
+    (is (= (feature-probability classifier "quick" :good) (/ 2 3)))))
