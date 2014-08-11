@@ -4,11 +4,11 @@
 
 (def classifier (atom {}))
 
-(train classifier (get-words "Nobody owns the water") :good)
-(train classifier (get-words "the quick rabbit jumps fences") :good)
+(train classifier (get-words "Nobody owns water") :good)
+(train classifier (get-words "quick rabbit jumps fences") :good)
 (train classifier (get-words "buy pharmaceuticals now") :bad)
-(train classifier (get-words "make quick money at the online casino") :bad)
-(train classifier (get-words "the quick brown fox jumps") :good)
+(train classifier (get-words "make quick money online casino") :bad)
+(train classifier (get-words "quick brown fox jumps") :good)
 (println @classifier)
 
 (deftest feature-count-test
@@ -16,6 +16,12 @@
     (is (= (:quick @classifier) {:good 2 :bad 1}))
     (is (= (:jumps @classifier) {:good 2}))))
 
-(deftest feature-count-test
+(deftest feature-probability-test
   (testing "should calculate feature probability correctly"
     (is (= (feature-probability classifier "quick" :good) (/ 2 3)))))
+
+(deftest category-probability-test
+  (testing "should calculate category probability correctly"
+    (is (= (category-probability classifier :good) (/ 11 19)))
+    (is (= (category-probability classifier :bad) (/ 8 19)))))
+

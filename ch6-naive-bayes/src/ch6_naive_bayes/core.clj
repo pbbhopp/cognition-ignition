@@ -13,6 +13,11 @@
       0
       (/ count sum))))
 
+(defn category-probability [data category]
+  (let [sum-coll (map #(reduce + (vals (second %))) @data)
+        cat-coll (map #(category (second %) 0) @data)]
+    (/ (reduce + cat-coll) (reduce + sum-coll))))
+
 (defprotocol Feature
   (get-words [str]))
 
