@@ -1,22 +1,30 @@
 (ns ch6-naive-bayes.core)
 
-(defn increment-feature [data feature category]
-  (let [result  ((keyword feature) @data {category 0})
+(defn make-classifier []
+  (atom {:data {} :counter {}}))
+
+(defn increment-feature [classifier feature category]
+  (let [result  ((keyword feature) (:data @classifier) {category 0})
         updated (merge-with + {category 1} result)]
-    (swap! data assoc (keyword feature) updated)))
+    (swap! classifier assoc-in [:data (keyword feature)] updated)))
 
-(defn feature-probability [data feature category]
-  (let [result ((keyword feature) @data)
-        sum    (reduce + (vals result))
-        count  (category result)]             
-    (if (= count 0)
+(defn increment-category [classifier category]
+  (let [result  (category (:counter @classifier) 0)]
+    (swap! classifier assoc-in [:counter category] (inc result))))
+
+(defn feature-probability [classifier feature category]
+  (let [count (category ((keyword feature) (:data @classifier)))
+        div   (category (:counter @classifier))]
+    (if (= div 0)
       0
-      (/ count sum))))
+      (/ count div))))
 
-(defn category-probability [data category]
-  (let [sum-coll (map #(reduce + (vals (second %))) @data)
-        cat-coll (map #(category (second %) 0) @data)]
-    (/ (reduce + cat-coll) (reduce + sum-coll))))
+(defn category-probability [classifier category]
+  (let [count (category (:counter @classifier))
+        div   (reduce + (vals (:counter @classifier)))]
+    (if (= div 0)
+      0
+      (/ count div))))
 
 (defprotocol Feature
   (get-words [str]))
@@ -26,5 +34,6 @@
   (get-words [str] (vec (clojure.string/split str #" "))))
 
 (defn train [classifier terms category]
+  (increment-category classifier category)
   (doseq [word terms]
     (increment-feature classifier word category)))
