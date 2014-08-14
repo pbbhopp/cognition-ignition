@@ -13,7 +13,7 @@
     (swap! classifier assoc-in [:counter category] (inc result))))
 
 (defn feature-probability [classifier feature category]
-  (let [count (category ((keyword feature) (:data @classifier)))
+  (let [count (category ((keyword feature) (:data @classifier) 0))
         div   (category (:counter @classifier))]
     (if (= div 0)
       0
@@ -25,6 +25,16 @@
     (if (= div 0)
       0
       (/ count div))))
+
+(defn weighted-probability [classifier feature category weight assumed-prob]
+  (let [basic-probabilty (feature-probability classifier feature category)
+        totals           (reduce + (vals (feature @classifier)))]
+    (/ (+ (* weight assumed-prob) (* totals basic-probabilty)) (+ weight totals))))
+
+(defn prob-of-category-given-features [classifier category & features]
+  (let [category-prob (category-probability classifier category)
+        weighted-prob (reduce * 1 (map #(weighted-probability classifier % category 1.0 0.5) features))]
+    (* category-prob weighted-prob)))
 
 (defprotocol Feature
   (get-words [str]))

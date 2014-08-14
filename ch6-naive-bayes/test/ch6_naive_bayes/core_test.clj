@@ -27,3 +27,8 @@
   (testing "should calculate category probability correctly"
     (is (= (category-probability classifier :good) (/ 3 5)))
     (is (= (category-probability classifier :bad) (/ 2 5)))))
+
+(deftest probability-of-category-given-features-test
+  (testing "should calculate conditional probability of category given some features correctly"
+    (is (= (prob-of-category-given-features classifier :good :quick :rabbit) 0.15))))
+    ;(is (= (prob-of-category-given-features classifier :bad :quick :rabbit) 0.05)))) *BUG* fix
