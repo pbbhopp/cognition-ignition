@@ -12,19 +12,20 @@
   (let [result  (category (:counter @classifier) 0)]
     (swap! classifier assoc-in [:counter category] (inc result))))
 
+(defn division-guard [number divisor]
+  (if (= divisor 0)
+    0
+    (/ number divisor)))
+
 (defn feature-probability [classifier feature category]
   (let [count (category ((keyword feature) (:data @classifier) 0))
         div   (category (:counter @classifier))]
-    (if (= div 0)
-      0
-      (/ count div))))
+    (division-guard count div)))
 
 (defn category-probability [classifier category]
   (let [count (category (:counter @classifier))
         div   (reduce + (vals (:counter @classifier)))]
-    (if (= div 0)
-      0
-      (/ count div))))
+    (division-guard count div)))
 
 (defn weighted-probability [classifier feature category weight assumed-prob]
   (let [basic-probabilty (feature-probability classifier feature category)
@@ -33,7 +34,8 @@
 
 (defn prob-of-category-given-features [classifier category & features]
   (let [category-prob (category-probability classifier category)
-        weighted-prob (reduce * 1 (map #(weighted-probability classifier % category 1.0 0.5) features))]
+        weight-probs  (map #(weighted-probability classifier % category 1.0 0.5) features)
+        weighted-prob (reduce * 1 weight-probs)]
     (* category-prob weighted-prob)))
 
 (defprotocol Feature
@@ -43,7 +45,7 @@
   Feature
   (get-words [str] (vec (clojure.string/split str #" "))))
 
-(defn train [classifier terms category]
+(defn train [classifier document category]
   (increment-category classifier category)
-  (doseq [word terms]
+  (doseq [word document]
     (increment-feature classifier word category)))
