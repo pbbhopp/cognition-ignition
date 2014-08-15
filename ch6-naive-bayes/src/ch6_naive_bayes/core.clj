@@ -28,9 +28,9 @@
     (division-guard count div)))
 
 (defn weighted-probability [classifier feature category weight assumed-prob]
-  (let [basic-probabilty (feature-probability classifier feature category)
-        totals           (reduce + (vals (feature @classifier)))]
-    (/ (+ (* weight assumed-prob) (* totals basic-probabilty)) (+ weight totals))))
+  (let [basic-prob (feature-probability classifier feature category)
+        totals     (reduce + (vals (feature (:data @classifier))))]
+    (/ (+ (* weight assumed-prob) (* totals basic-prob)) (+ weight totals))))
 
 (defn prob-of-category-given-features [classifier category & features]
   (let [category-prob (category-probability classifier category)
