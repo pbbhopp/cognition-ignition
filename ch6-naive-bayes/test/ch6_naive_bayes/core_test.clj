@@ -30,5 +30,14 @@
 
 (deftest probability-of-category-given-features-test
   (testing "should calculate conditional probability of category given some features correctly"
-    (is (= (prob-of-category-given-features classifier :good :quick :rabbit) 0.15624999999999997))
-    (is (= (prob-of-category-given-features classifier :bad :quick :rabbit) 0.05))))
+    (is (= (prob-of-category-given-features classifier :good [:quick :rabbit]) 0.15624999999999997))
+    (is (= (prob-of-category-given-features classifier :bad [:quick :rabbit]) 0.05))))
+
+(deftest classify-documents-test
+  (testing "should classify document of features correctly"
+    (is (= (classify classifier "rabbit quick") :good))
+    (is (= (classify classifier "quick money") :bad))
+    (is (= (classify classifier "brown rabbit") :good))
+    (is (= (classify classifier "buy casino") :bad))
+    (is (= (classify classifier "Nobody buy brown water") :good))
+    (is (= (classify classifier "now owns online pharmaceuticals") :bad))))

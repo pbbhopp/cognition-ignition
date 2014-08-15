@@ -32,7 +32,7 @@
         totals     (reduce + (vals (feature (:data @classifier))))]
     (/ (+ (* weight assumed-prob) (* totals basic-prob)) (+ weight totals))))
 
-(defn prob-of-category-given-features [classifier category & features]
+(defn prob-of-category-given-features [classifier category features]
   (let [category-prob (category-probability classifier category)
         weight-probs  (map #(weighted-probability classifier % category 1.0 0.5) features)
         weighted-prob (reduce * 1 weight-probs)]
@@ -49,3 +49,17 @@
   (increment-category classifier category)
   (doseq [word document]
     (increment-feature classifier word category)))
+
+(defn sorted-map-by-val [m]
+  (into (sorted-map-by (fn [key1 key2] (compare [(get m key2) key2] [(get m key1) key1]))) m))
+
+(defn categories-prob [classifier categories features]
+  (let [cat-prob  (fn [cat] (prob-of-category-given-features classifier cat features))
+        cat-probs (reduce (fn [m cat] (assoc m cat (cat-prob cat))) {} categories)]
+    (sorted-map-by-val cat-probs)))
+
+(defn classify [classifier document]
+  (let [features  (map keyword (get-words document))
+        all-cats  (keys (:counter @classifier))
+        cat-probs (categories-prob classifier all-cats features)]
+    (key (first cat-probs))))
