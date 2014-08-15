@@ -9,7 +9,7 @@
     (swap! classifier assoc-in [:data (keyword feature)] updated)))
 
 (defn increment-category [classifier category]
-  (let [result  (category (:counter @classifier) 0)]
+  (let [result (category (:counter @classifier) 0)]
     (swap! classifier assoc-in [:counter category] (inc result))))
 
 (defn division-guard [number divisor]
@@ -18,7 +18,7 @@
     (/ number divisor)))
 
 (defn feature-probability [classifier feature category]
-  (let [count (category ((keyword feature) (:data @classifier) 0))
+  (let [count (category ((keyword feature) (:data @classifier)) 0)
         div   (category (:counter @classifier))]
     (division-guard count div)))
 

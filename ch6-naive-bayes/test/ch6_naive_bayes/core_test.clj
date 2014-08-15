@@ -20,8 +20,8 @@
   (testing "should calculate feature probability correctly"
     (is (= (feature-probability classifier "quick" :good) (/ 2 3)))
     (is (= (feature-probability classifier "quick" :bad) (/ 1 2)))
-    (is (= (feature-probability classifier "rabbit" :good) (/ 1 3)))))
-    ;(is (= (feature-probability classifier "rabbit" :bad) (/ 2 3))))) *BUG* fix
+    (is (= (feature-probability classifier "rabbit" :good) (/ 1 3)))
+    (is (= (feature-probability classifier "rabbit" :bad) 0))))
 
 (deftest category-probability-test
   (testing "should calculate category probability correctly"
