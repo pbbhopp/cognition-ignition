@@ -7,15 +7,13 @@
 (defn rnd []
   (+ (* (- 1 -1) (rand)) -1))
 
-(defn make-matrix [rows cols val-fn]
-  (vec (take rows (repeatedly #(repeat-vector cols val-fn)))))
+(defn make-neuron [num-inputs]
+  {:weights    (repeat-vector (inc num-inputs) rnd)
+   :last_delta (repeat-vector (inc num-inputs) (fn [] 0))
+   :deriv      (repeat-vector (inc num-inputs) (fn [] 0))})
 
-(defn make-neural-network [input-nodes hidden-nodes output-nodes]
-  (atom {:hidden-nodes (make-matrix 1 (+ 1 hidden-nodes) (fn [] 1))
-         :input-nodes  (make-matrix 1 (+ 1 input-nodes) (fn [] 1))
-         :output-nodes (make-matrix 1 output-nodes (fn [] 1))
-         :input-weights  (make-matrix input-nodes hidden-nodes rnd)
-         :output-weights (make-matrix hidden-nodes output-nodes rnd)}))
+(defn make-layer [num-nodes num-inputs]
+  (into [] (take num-nodes (repeatedly #(make-neuron num-inputs)))))
 
 (defn transpose [coll]
   (apply map vector coll))
