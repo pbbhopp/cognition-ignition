@@ -6,3 +6,5 @@
   (testing "making an initial state neural network"
     (let [nn [(make-layer 4 2) (make-layer 1 2)]]
       (is (= (count nn) 2)))))
+
+(def network (atom [(make-layer 4 2) (make-layer 1 2)]))
