@@ -34,13 +34,13 @@
         sum      (reduce + mults)]
     (+ init-sum sum)))
 
-(defn activate-neuron [neuron idx-out idx-in]
-  (let [activator (activation neuron [1 1])]
+(defn activate-neuron [neuron idx-out idx-in input]
+  (let [activator (activation neuron input)]
     (swap! network assoc-in [idx-out idx-in :activation] activator)
     (swap! network assoc-in [idx-out idx-in :output] (sigmoid activator))))
 
-(defn activate-neurons [layer idx]
-  (keep-indexed #(activate-neuron %2 idx %1) layer))
+(defn activate-neurons [layer idx input]
+  (keep-indexed #(activate-neuron %2 idx %1 input) layer))
 
 (defn forward-propagate [network input]
-  (keep-indexed #(activate-neurons %2 %1) @network))
+  (keep-indexed #(activate-neurons %2 %1 input) @network))
