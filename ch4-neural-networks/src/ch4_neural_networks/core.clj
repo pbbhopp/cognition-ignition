@@ -19,11 +19,6 @@
 (defn make-layer [num-nodes num-inputs]
   (into [] (take num-nodes (repeatedly #(make-neuron num-inputs)))))
 
-(defn get-inputs [layer idx default]
-  (if (= idx 0)
-    default
-    (mapv #(:output) layer)))
-
 (defn interleave-multiply [& colls]
   (let [coll (partition (count colls) (apply interleave colls))]
     (map #(reduce * %) coll)))
