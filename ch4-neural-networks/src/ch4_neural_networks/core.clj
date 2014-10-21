@@ -54,3 +54,8 @@
   (doseq [idx-layer (range (count @network))]
     (forward-propagate-layer network input idx-layer)))
 
+(defn output-error [network expected-output]
+  (let [neuron (first (last @network))
+        error  (- expected-output (:output neuron))
+        delta  (* error (dsigmoid (:output neuron)))]
+    (swap! network assoc-in [(dec (count @network)) 0 :delta] delta)))

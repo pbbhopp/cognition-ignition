@@ -34,3 +34,10 @@
       (is (= activs1 [0.7413991243079338 0.15417318630866406 -0.1322270911223906 -0.40702572197133036]))
       (is (= outputs2 [-0.26959319163346745]))
       (is (= activs2 [-0.27642507796554894])))))
+
+(deftest calculate-output-error
+  (testing "find delta or diff between output and expected output"
+    (let [_     (output-error nn 0)
+          error (get-in @nn [1 0 :delta])]
+      (is (= error 0.24999902664118395)))))
+
