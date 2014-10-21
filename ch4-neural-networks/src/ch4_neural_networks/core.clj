@@ -13,7 +13,7 @@
 
 (defn make-neuron [num-inputs]
   {:weights    (repeat-vector (inc num-inputs) rnd)
-   :last_delta (repeat-vector (inc num-inputs) (fn [] 0))
+   :last-delta (repeat-vector (inc num-inputs) (fn [] 0))
    :deriv      (repeat-vector (inc num-inputs) (fn [] 0))})
 
 (defn make-layer [num-nodes num-inputs]
@@ -28,19 +28,29 @@
   (let [coll (partition (count colls) (apply interleave colls))]
     (map #(reduce * %) coll)))
 
+(defn get-outputs [network idx-layer]
+  (let [layer (get @network idx-layer)]
+    (map #(:output %) layer)))
+
 (defn activation [neuron input]
   (let [init-sum (* (last (:weights neuron)) 1)
         mults    (interleave-multiply (drop-last (:weights neuron)) input)
         sum      (reduce + mults)]
     (+ init-sum sum)))
 
-(defn activate-neuron [neuron idx-out idx-in input]
-  (let [activator (activation neuron input)]
-    (swap! network assoc-in [idx-out idx-in :activation] activator)
-    (swap! network assoc-in [idx-out idx-in :output] (sigmoid activator))))
+(defn activate-neuron [network input idx-layer idx-neuron]
+  (let [neuron    (get-in @network [idx-layer idx-neuron])
+        activator (activation neuron input)]
+    (swap! network assoc-in [idx-layer idx-neuron :activation] activator)
+    (swap! network assoc-in [idx-layer idx-neuron :output] (sigmoid activator))))
 
-(defn activate-neurons [layer idx input]
-  (keep-indexed #(activate-neuron %2 idx %1 input) layer))
+(defn forward-propagate-layer [network input idx-layer]
+  (let [layer  (get @network idx-layer)
+        -input (if (zero? idx-layer) input (get-outputs network (dec idx-layer)))]
+    (doseq [idx-neuron (range (count layer))]
+      (activate-neuron network -input idx-layer idx-neuron))))
 
-(defn forward-propagate [network input]
-  (keep-indexed #(activate-neurons %2 %1 input) @network))
+(defn forward-propagate-net [network input]
+  (doseq [idx-layer (range (count @network))]
+    (forward-propagate-layer network input idx-layer)))
+
