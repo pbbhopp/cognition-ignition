@@ -54,3 +54,8 @@
         error  (- expected-output (:output neuron))
         delta  (* error (dsigmoid (:output neuron)))]
     (swap! network assoc-in [(dec (count @network)) 0 :delta] delta)))
+
+(defn sum-errors [idx-neuron layer]
+  (let [mult-coll (map #(* (get-in % [:weights idx-neuron]) (:delta %)) layer)]
+    (reduce + mult-coll)))
+

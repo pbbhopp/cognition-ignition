@@ -41,3 +41,9 @@
           error (get-in @nn [1 0 :delta])]
       (is (= error 0.24999902664118395)))))
 
+(deftest calculate-sum-of-errors-in-weights
+  (testing "find sum of errors in weights"
+    (let [sum-of-errors-in-weights (sum-errors 0 (second @nn))]
+      (is (= sum-of-errors-in-weights 0.0496726930464618)))))
+
+
