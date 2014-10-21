@@ -59,3 +59,17 @@
   (let [mult-coll (map #(* (get-in % [:weights idx-neuron]) (:delta %)) layer)]
     (reduce + mult-coll)))
 
+(defn backward-propagate-layer [network idx-layer part]
+  (let [layer1  (first part)
+        layer2  (second part)]
+    (doseq [idx (range (count layer1))]
+      (swap! network assoc-in [idx-layer idx :delta] 
+             (* (sum-errors idx layer2) (dsigmoid (get-in layer1 [idx :output])))))))
+  
+(defn backward-propagate-net [network expected-output]
+  (let [_        (output-error network expected-output)
+        net-part (reverse (partition 2 1 @network))]
+    (doseq [idx  (range (count net-part))
+            part net-part]
+      (backward-propagate-layer network idx part))))
+ 
