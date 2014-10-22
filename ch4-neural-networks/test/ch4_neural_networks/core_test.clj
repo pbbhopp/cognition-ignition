@@ -58,18 +58,11 @@
 (deftest update-weights-test
   (testing "should correctly calibrate weights in proportion to errors for inputs [[0 0 0] [0 1 1] [1 0 1] [1 1 0]]"
     (let [net (make-net)
-          _   (forward-propagate-net net [0 0])
-          _   (backward-propagate-net net 0)
-          _   (error-derivatives-net net [0 0])
-          _   (forward-propagate-net net [0 1])
-          _   (backward-propagate-net net 1)
-          _   (error-derivatives-net net [0 1])
-          _   (forward-propagate-net net [1 0])
-          _   (backward-propagate-net net 1)
-          _   (error-derivatives-net net [1 0])
-          _   (forward-propagate-net net [1 1])
-          _   (backward-propagate-net net 0)
-          _   (error-derivatives-net net [1 1]) 
+          inputs [[0 0 0] [0 1 1] [1 0 1] [1 1 0]]
+          _ (doseq [input inputs]
+              (forward-propagate-net net (drop-last input))
+              (backward-propagate-net net (last input))
+              (error-derivatives-net net (drop-last input)))
           _   (update-weights-net net 0.3 0.8)
           weights-coll (map #(:weights %) (first @net))]
       (is (= weights-coll [[ 0.06370920334743649    0.2549800433044068  0.8307915638711467] 
