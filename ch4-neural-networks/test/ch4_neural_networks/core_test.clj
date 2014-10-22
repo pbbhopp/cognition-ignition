@@ -44,3 +44,13 @@
           _   (backward-propagate-net net 0)
           deltas (map #(:delta %) (first @net))]
       (is (= deltas [0.029958243616168813 0.01601077209310136 0.06331359834046521 -0.06486620358573723])))))
+
+(deftest error-derivatives-for-whole-network-with-one-input 
+  (testing "should correctly calculate deltas in errors between weight and expected output"
+    (let [net (make-net)
+          _   (forward-propagate-net net [0 0])
+          _   (backward-propagate-net net 0)
+          _   (error-derivatives-net net [0 0]) 
+          derivs (map #(:deriv %) (first @net))]
+      (is (= derivs [[0.0 0.0 0.029958243616168813] [0.0 0.0 0.01601077209310136] 
+                     [0.0 0.0 0.06331359834046521] [0.0 0.0 -0.06486620358573723]])))))

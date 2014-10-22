@@ -4,8 +4,7 @@
 (defn repeat-vector [n val-fn]
   (vec (take n (repeatedly val-fn))))
 
-(defn rnd []
-  (+ (* (- 1 -1) (rand)) -1))
+(defn rnd [] (+ (* (- 1 -1) (rand)) -1))
 
 (defn sigmoid [x] (Math/tanh x))
 
@@ -72,4 +71,22 @@
     (doseq [idx  (range (count net-part))
             part net-part]
       (backward-propagate-layer network idx part))))
+
+(defn error-derivatives [network input idx-layer idx-neuron]
+  (doseq [idx-input (range (count input))
+          signal    input]
+    (swap! network update-in [idx-layer idx-neuron :deriv idx-input] 
+           + (* (get-in @network [idx-layer idx-neuron :delta]) signal))) 
+  (swap! network update-in [idx-layer idx-neuron :deriv (count input)] 
+         + (* (get-in @network [idx-layer idx-neuron :delta]) 1.0)))  
+  
+(defn error-derivatives-layer [network input idx-layer]
+  (let [layer  (get @network idx-layer)
+        -input (if (zero? idx-layer) input (get-outputs network (dec idx-layer)))]
+    (doseq [idx-neuron (range (count layer))]
+      (error-derivatives network -input idx-layer idx-neuron))))
  
+(defn error-derivatives-net [network input]
+  (doseq [idx-layer (range (count @network))]
+    (error-derivatives-layer network input idx-layer)))
+  
