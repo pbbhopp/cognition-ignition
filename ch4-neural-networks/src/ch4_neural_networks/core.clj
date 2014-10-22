@@ -89,4 +89,21 @@
 (defn error-derivatives-net [network input]
   (doseq [idx-layer (range (count @network))]
     (error-derivatives-layer network input idx-layer)))
+
+(defn update-weights [network rate momentum idx-layer idx-neuron]
+  (let [weights (get-in @network [idx-layer idx-neuron :weights])]
+    (doseq [idx-weight (range (count weights))]
+      (let [delta (+ (* rate (get-in @network [idx-layer idx-neuron :deriv idx-weight])) 
+                     (* momentum (get-in @network [idx-layer idx-neuron :last-delta idx-weight])))]
+        (swap! network update-in [idx-layer idx-neuron :weights idx-weight] + delta)
+        (swap! network assoc-in [idx-layer idx-neuron :last-delta idx-weight] delta)
+        (swap! network assoc-in [idx-layer idx-neuron :deriv idx-weight] 0.0)))))
   
+(defn update-weights-layer [network rate momentum idx-layer]
+  (let [layer (get @network idx-layer)]
+    (doseq [idx-neuron (range (count layer))]
+      (update-weights network rate momentum idx-layer idx-neuron))))
+
+(defn update-weights-net [network rate momentum]
+  (doseq [idx-layer (range (count @network))]
+    (update-weights-layer network rate momentum idx-layer)))

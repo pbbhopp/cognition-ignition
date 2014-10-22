@@ -37,7 +37,7 @@
       (is (= outputs2 [-0.26959319163346745]))
       (is (= activs2 [-0.27642507796554894])))))
 
-(deftest backward-propagate-for-whole-network-with-one-input 
+(deftest backward-propagate-for-whole-network-with-one-input-test 
   (testing "should correctly calculate deltas in errors between weight and expected output"
     (let [net (make-net)
           _   (forward-propagate-net net [0 0])
@@ -45,7 +45,7 @@
           deltas (map #(:delta %) (first @net))]
       (is (= deltas [0.029958243616168813 0.01601077209310136 0.06331359834046521 -0.06486620358573723])))))
 
-(deftest error-derivatives-for-whole-network-with-one-input 
+(deftest error-derivatives-for-whole-network-with-one-input-test 
   (testing "should correctly calculate deltas in errors between weight and expected output"
     (let [net (make-net)
           _   (forward-propagate-net net [0 0])
@@ -54,3 +54,25 @@
           derivs (map #(:deriv %) (first @net))]
       (is (= derivs [[0.0 0.0 0.029958243616168813] [0.0 0.0 0.01601077209310136] 
                      [0.0 0.0 0.06331359834046521] [0.0 0.0 -0.06486620358573723]])))))
+
+(deftest update-weights-test
+  (testing "should correctly calibrate weights in proportion to errors for inputs [[0 0 0] [0 1 1] [1 0 1] [1 1 0]]"
+    (let [net (make-net)
+          _   (forward-propagate-net net [0 0])
+          _   (backward-propagate-net net 0)
+          _   (error-derivatives-net net [0 0])
+          _   (forward-propagate-net net [0 1])
+          _   (backward-propagate-net net 1)
+          _   (error-derivatives-net net [0 1])
+          _   (forward-propagate-net net [1 0])
+          _   (backward-propagate-net net 1)
+          _   (error-derivatives-net net [1 0])
+          _   (forward-propagate-net net [1 1])
+          _   (backward-propagate-net net 0)
+          _   (error-derivatives-net net [1 1]) 
+          _   (update-weights-net net 0.3 0.8)
+          weights-coll (map #(:weights %) (first @net))]
+      (is (= weights-coll [[ 0.06370920334743649    0.2549800433044068  0.8307915638711467] 
+                           [-0.21764478191353542   -0.23948088843626697 0.20971119137762712] 
+                           [ 0.06793775235344804    0.1895700906691188  0.07989673048653131] 
+                           [-0.04049729791891139    0.08431638220097729 -0.6309891804758488]])))))
