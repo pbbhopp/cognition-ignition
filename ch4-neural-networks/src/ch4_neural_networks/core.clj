@@ -38,15 +38,14 @@
             output (sigmoid active)]
         (forward (rest weights) input (conj activations active) (conj outputs output))))))
 
-(defn forward-layer [network idx-layer input]
-  (let [[idx layer] idx-layer
-         weights    (:weights layer)
+(defn forward-layer [network idx-weights input]
+  (let [[idx weights] idx-weights
         -input      (if (zero? idx) input (get-in network [(dec idx) :outputs]))
         result      (forward weights -input)
         -network    (assoc-in network [idx :activations] (:activations result))]
     (assoc-in -network [idx :outputs] (:outputs result))))
 
 (defn forward-propagate [network input]
-  (let [idx-layers (map-indexed #(vector %1 %2) network)]
-    (reduce #(forward-layer %1 %2 input) network idx-layers)))
+  (let [idx-weights-coll (map-indexed #(vector %1 (:weights %2)) network)]
+    (reduce #(forward-layer %1 %2 input) network idx-weights-coll)))
 
