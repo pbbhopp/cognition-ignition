@@ -7,8 +7,7 @@
 
 (defn dsigmoid [y] (- 1.0 (* y y)))
 
-(defn make-network
-  [rows cols f]
+(defn make-network [rows cols f]
   (vec (repeat rows (vec (repeat cols f)))))
 
 (defn make-layer [num-nodes num-inputs]
@@ -40,12 +39,32 @@
 
 (defn forward-layer [network idx-weights input]
   (let [[idx weights] idx-weights
-        -input      (if (zero? idx) input (get-in network [(dec idx) :outputs]))
-        result      (forward weights -input)
-        -network    (assoc-in network [idx :activations] (:activations result))]
+        -input        (if (zero? idx) input (get-in network [(dec idx) :outputs]))
+        result        (forward weights -input)
+        -network      (assoc-in network [idx :activations] (:activations result))]
     (assoc-in -network [idx :outputs] (:outputs result))))
 
 (defn forward-propagate [network input]
   (let [idx-weights-coll (map-indexed #(vector %1 (:weights %2)) network)]
     (reduce #(forward-layer %1 %2 input) network idx-weights-coll)))
 
+(defn output-error [network expected-output]
+  (let [output (first (:outputs (last network)))
+        error  (- expected-output output)
+        delta  (* error (dsigmoid output))]
+    (assoc-in network [(dec (count network)) :deltas] [delta])))
+
+(defn transpose [coll]
+  (apply map vector coll))
+
+(defn back-prop-layer [network idx-layer parted-net]
+  (let [layer->  (first parted-net)
+        ->layer  (second parted-net)
+        sum-errs (map #(reduce + (interleave-multiply % (:deltas ->layer))) (transpose (:weights ->layer)))
+        deltas   (interleave-multiply sum-errs (map dsigmoid (:outputs layer->)))]
+    (assoc-in network [idx-layer :deltas] (vec deltas))))
+
+(defn backward-propagate [network expected-output]
+  (let [-network   (output-error network expected-output)
+        parted-net (vec (reverse (partition 2 1 -network)))]
+    (reduce-kv #(back-prop-layer %1 %2 %3) -network parted-net)))

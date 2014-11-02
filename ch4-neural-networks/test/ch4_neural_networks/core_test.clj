@@ -33,7 +33,7 @@
     :deriv [[0.0 0.0 0.0 0.0 0.0]]}])
 
 (deftest forward-propagate-test
-  (testing "forward propagate neural network"
+  (testing "should forward propagate neural network with coreect outputs and activations"
     (let [nn       (make-net)
           -nn      (forward-propagate nn [0 0])
           outputs1 (:outputs (first -nn))
@@ -45,4 +45,13 @@
       (is (= outputs2 [-0.26959319163346745]))
       (is (= activs2 [-0.27642507796554894])))))
    
+(deftest backward-propagate-test
+  (testing "should backward propagate neural network with correct deltas"
+    (let [nn       (make-net)
+          -nn      (forward-propagate nn [0 0])
+          --nn     (backward-propagate -nn 0)
+          deltas1 (:deltas (first --nn))
+          deltas2 (:deltas (last --nn))]
+      (is (= deltas1 [0.029958243616168813 0.01601077209310136 0.06331359834046521 -0.06486620358573723]))
+      (is (= deltas2 [0.24999902664118395])))))
    
