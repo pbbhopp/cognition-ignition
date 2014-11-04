@@ -24,13 +24,13 @@
                  [0.0 0.0 0.0]
                  [0.0 0.0 0.0]
                  [0.0 0.0 0.0]]
-    :deriv [[0.0 0.0 0.0]
-            [0.0 0.0 0.0]
-            [0.0 0.0 0.0]
-            [0.0 0.0 0.0]]}          
+    :derivs [[0.0 0.0 0.0]
+             [0.0 0.0 0.0]
+             [0.0 0.0 0.0]
+             [0.0 0.0 0.0]]}          
    {:weights [[0.19869154577851822 0.06557770702187848 0.25770916351234513 -0.30487838476232276 -0.4954168557933254]]
     :last-delta [[0.0 0.0 0.0 0.0 0.0]]
-    :deriv [[0.0 0.0 0.0 0.0 0.0]]}])
+    :derivs [[0.0 0.0 0.0 0.0 0.0]]}])
 
 (deftest forward-propagate-test
   (testing "should forward propagate neural network with coreect outputs and activations"
@@ -44,14 +44,27 @@
       (is (= activs1 [0.7413991243079338 0.15417318630866406 -0.1322270911223906 -0.40702572197133036]))
       (is (= outputs2 [-0.26959319163346745]))
       (is (= activs2 [-0.27642507796554894])))))
-   
+
 (deftest backward-propagate-test
   (testing "should backward propagate neural network with correct deltas"
-    (let [nn       (make-net)
-          -nn      (forward-propagate nn [0 0])
-          --nn     (backward-propagate -nn 0)
-          deltas1 (:deltas (first --nn))
-          deltas2 (:deltas (last --nn))]
+    (let [nn (-> (make-net)
+                 (forward-propagate [0 0])
+                 (backward-propagate 0))
+          deltas1 (:deltas (first nn))
+          deltas2 (:deltas (last nn))]
       (is (= deltas1 [0.029958243616168813 0.01601077209310136 0.06331359834046521 -0.06486620358573723]))
       (is (= deltas2 [0.24999902664118395])))))
    
+(deftest error-derivatives-test
+  (testing "should correctly calculate error derivatives after back propagation"
+    (let [nn (-> (make-net)
+                 (forward-propagate [0 0])
+                 (backward-propagate 0)
+                 (error-derivatives [0 0]))
+          derivs1 (:derivs (first nn))
+          derivs2 (:derivs (last nn))]
+      (is (= derivs1 [[0.0  0.0  0.029958243616168813]
+                      [0.0  0.0  0.01601077209310136]
+                      [0.0  0.0  0.06331359834046521]
+                      [0.0  0.0 -0.06486620358573723]]))
+      (is (= derivs2 [[0.15749682061009698 0.03824064021874995 -0.032865327793079054 -0.09648570925615471 0.24999902664118395]])))))   

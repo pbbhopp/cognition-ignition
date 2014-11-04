@@ -68,3 +68,17 @@
   (let [-network   (output-error network expected-output)
         parted-net (vec (reverse (partition 2 1 -network)))]
     (reduce-kv #(back-prop-layer %1 %2 %3) -network parted-net)))
+
+(defn err-deriv [deriv inputs delta]
+  (let [-deriv (mapv #(+ %1 (* %2 delta)) (drop-last deriv) inputs)] 
+    (conj -deriv (+ (last deriv) (* delta 1.0)))))
+
+(defn err-deriv-layer [network idx-layer _ inputs]
+  (let [-inputs (if (zero? idx-layer) inputs (get-in network [(dec idx-layer) :outputs]))
+        derivs  (get-in network [idx-layer :derivs])
+        -derivs (map-indexed #(err-deriv %2 -inputs (get-in network [idx-layer :deltas %1])) derivs)]
+    (assoc-in network [idx-layer :derivs] (vec -derivs))))
+
+(defn error-derivatives [network inputs]
+  (let [idx-layers (vec (range (count network)))]
+    (reduce-kv #(err-deriv-layer %1 %2 %3 inputs) network idx-layers)))
