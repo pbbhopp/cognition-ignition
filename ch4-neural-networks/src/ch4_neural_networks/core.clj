@@ -17,7 +17,7 @@
 
 (defn activate [weights input]
   (let [sum (reduce + (map #(* %1 %2) (drop-last weights) input))]
-   (+ (* (last weights) 1) sum)))
+    (+ (* (last weights) 1) sum)))
 
 (defn activate-neuron [neuron input]
   (let [n  (assoc neuron :activation (activate (:weights neuron) input))
@@ -37,3 +37,23 @@
             input (map :output layer)
             net   (conj net layer)]
         (forward-propagate (rest layers) input net)))))
+
+(defn delta [neuron sum-error]
+  (let [-neuron (assoc neuron :delta sum-error)]
+    -neuron))
+
+(defn backward-propagate
+  ([->net expected-output]
+    (let [net<- (reverse ->net)
+          f     (fn [neuron] (* (- expected-output (:output neuron)) (dsigmoid (:output neuron))))
+          layer (map #(delta % (f %)) (first net<-))
+          <-net (conj [] layer)]
+      (backward-propagate (rest net<-) layer <-net)))
+  ([net<- next-layer <-net]
+    (if (empty? net<-)
+      (reverse <-net)
+      (let [f     (fn [idx l] (reduce + (map #(* (get-in % [:weights idx]) (:delta %)) l)))
+            layer (map-indexed #(delta %2 (* (dsigmoid (:output %2)) (f %1 next-layer))) (first net<-))
+            <-net (conj <-net layer)]
+        (backward-propagate (rest net<-) layer <-net)))))
+
