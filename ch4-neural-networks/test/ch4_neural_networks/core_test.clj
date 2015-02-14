@@ -36,3 +36,15 @@
       (is (= d2 -0.016026374866587624))
       (is (= d3 -0.085459358320919)))))
 
+(deftest error-derivatives-test
+  (testing "should calculate error derivatives in weights correctly"
+    (let [nn [[{:weights [0.129952 -0.923123  0.341232] :output 0.584490 :delta -0.0034190 :deriv [0 0 0]}
+               {:weights [0.570345 -0.328932 -0.115223] :output 0.471226 :delta -0.0160263 :deriv [0 0 0]}]
+              [{:weights [0.164732  0.752621 -0.993423] :output 0.367610 :delta -0.0854590 :deriv [0 0 0]}]]
+          nn (error-derivatives nn [0 0])
+          d1 (:deriv (ffirst nn))
+          d2 (:deriv (second (first nn)))
+          d3 (:deriv (first (second nn)))]
+      (is (= d1 [0.0 0.0 -0.003419]))
+      (is (= d2 [0.0 0.0 -0.0160263]))
+      (is (= d3 [-0.049949930909999996 -0.04027050273399999 -0.085459])))))

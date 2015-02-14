@@ -57,3 +57,22 @@
             <-net (conj <-net layer)]
         (backward-propagate (rest net<-) layer <-net)))))
 
+(defn derivatives [neuron input]
+  (let [derivs   (map #(* (:delta neuron) %) input)
+        -derivs  (map #(+ %1 %2) (drop-last (:deriv neuron)) derivs)
+        --derivs (conj (vec -derivs) (+ (last (:deriv neuron)) (* 1 (:delta neuron))))]
+    (assoc neuron :deriv --derivs)))
+
+(defn error-derivatives
+  ([network input]
+    (let [layer (map #(derivatives % input) (first network))
+          input (map :output layer)
+          net   (conj [] layer)]
+      (error-derivatives (rest network) input net)))
+  ([layers input net]
+    (if (empty? layers)
+      net
+      (let [layer (map #(derivatives % input) (first layers))
+            input (map :output layer)
+            net   (conj net layer)]
+        (error-derivatives (rest layers) input net)))))
