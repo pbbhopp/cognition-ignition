@@ -7,8 +7,7 @@
 
 (defn dsigmoid [y] (* y (- 1.0 y)))
 
-(defn make-vector-with [n f]
-  (take n (repeatedly f)))
+(defn make-vector-with [n f] (take n (repeatedly f)))
 
 (defn make-neuron [num-inputs]
   {:weights    (make-vector-with num-inputs rnd)
@@ -76,3 +75,17 @@
             input (map :output layer)
             net   (conj net layer)]
         (error-derivatives (rest layers) input net)))))
+
+(defn update-neuron [neuron lrate mrate]
+  (let [deltas (map #(+ (* lrate %1) (* mrate %2)) (:deriv neuron) (:last-delta neuron))
+        n      (assoc neuron :weights (map #(+ %1 %2) (:weights neuron) deltas))
+        -n     (assoc n :last-delta deltas)
+        --n    (assoc -n :deriv (take (count (:deriv neuron)) (repeat 0.0)))]
+    --n))
+
+(defn update-weights [network lrate mrate & {:keys [nn] :or {nn []}}]
+  (if (empty? network)
+    nn
+    (let [layer (map #(update-neuron % lrate mrate) (first network))
+          net   (conj nn layer)]
+      (update-weights (rest network) lrate mrate :nn net))))

@@ -48,3 +48,10 @@
       (is (= d1 [0.0 0.0 -0.003419]))
       (is (= d2 [0.0 0.0 -0.0160263]))
       (is (= d3 [-0.049949930909999996 -0.04027050273399999 -0.085459])))))
+
+(deftest update-weights-test
+  (testing "should update weights correctly"
+    (let [nn [[{:weights [0.2 0.2 0.2] :deriv [0.1 -0.5 100.0] :last-delta [0,0,0]}]]
+          nn (update-weights nn 1.0 0.0)
+          w  (:weights (ffirst nn))]
+      (is (= w [0.30000000000000004 -0.3 100.2])))))
