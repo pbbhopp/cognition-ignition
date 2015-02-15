@@ -22,19 +22,13 @@
         -n (assoc n :output (sigmoid (:activation n)))]
     -n))
 
-(defn forward-propagate
-  ([network input]
-    (let [layer (map #(activate-neuron % input) (first network))
+(defn forward-propagate [layers input & {:keys [nn] :or {nn []}}]
+  (if (empty? layers)
+    nn
+    (let [layer (map #(activate-neuron % input) (first layers))
           input (map :output layer)
-          net   (conj [] layer)]
-      (forward-propagate (rest network) input net)))
-  ([layers input net]
-    (if (empty? layers)
-      net
-      (let [layer (map #(activate-neuron % input) (first layers))
-            input (map :output layer)
-            net   (conj net layer)]
-        (forward-propagate (rest layers) input net)))))
+          net   (conj nn layer)]
+      (forward-propagate (rest layers) input :nn net))))
 
 (defn delta [neuron sum-error]
   (assoc neuron :delta sum-error))
