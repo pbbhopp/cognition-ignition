@@ -61,19 +61,13 @@
         --derivs (conj (vec -derivs) (+ (last (:deriv neuron)) (* 1 (:delta neuron))))]
     (assoc neuron :deriv --derivs)))
 
-(defn error-derivatives
-  ([network input]
-    (let [layer (map #(derivatives % input) (first network))
+(defn error-derivatives [layers input & {:keys [nn] :or {nn []}}]
+  (if (empty? layers)
+    nn
+    (let [layer (map #(derivatives % input) (first layers))
           input (map :output layer)
-          net   (conj [] layer)]
-      (error-derivatives (rest network) input net)))
-  ([layers input net]
-    (if (empty? layers)
-      net
-      (let [layer (map #(derivatives % input) (first layers))
-            input (map :output layer)
-            net   (conj net layer)]
-        (error-derivatives (rest layers) input net)))))
+          net   (conj nn layer)]
+      (error-derivatives (rest layers) input :nn net))))
 
 (defn update-neuron [neuron lrate mrate]
   (let [deltas (map #(+ (* lrate %1) (* mrate %2)) (:deriv neuron) (:last-delta neuron))
