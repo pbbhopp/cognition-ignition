@@ -74,3 +74,18 @@
     (let [layer (map #(update-neuron % lrate mrate) (first network))
           net   (conj nn layer)]
       (update-weights (rest network) lrate mrate :nn net))))
+
+(defn cycle-through-domain [network domain]
+  (reduce
+    #(-> %1
+         (println %2)
+         (forward-propagate (drop-last %2))
+         (backward-propagate (last %2))
+         (error-derivatives (drop-last %2)))
+    network domain))
+
+(defn train-network [network domain iterations lrate mrate]
+  (reduce
+    (fn [n _] (update-weights (cycle-through-domain n domain) lrate mrate))
+    network
+    (range iterations)))
