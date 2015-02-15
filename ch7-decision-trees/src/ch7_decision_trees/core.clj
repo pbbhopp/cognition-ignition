@@ -10,5 +10,7 @@
         entropy      (reduce #(- %1 (* %2 (log2 %2))) 0.0 probs)]
     entropy))
 
-(let [data [[1 1 "yes"] [1 1 "yes"] [1 0 "no"] [0 1 "no"] [0 1 "no"]]]
-  (shannon-entropy data))
+(defn split-data-set [data-set axis value]
+  (let [data (filter #(= (get % axis) value) data-set)
+        data (map #(concat (subvec % 0 axis) (subvec % (inc axis))) data)]
+    data))  
