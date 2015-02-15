@@ -22,16 +22,15 @@
         -n (assoc n :output (sigmoid (:activation n)))]
     -n))
 
-(defn forward-propagate [layers input & {:keys [nn] :or {nn []}}]
-  (if (empty? layers)
+(defn forward-propagate [network input & {:keys [nn] :or {nn []}}]
+  (if (empty? network)
     nn
-    (let [layer (map #(activate-neuron % input) (first layers))
+    (let [layer (map #(activate-neuron % input) (first network))
           input (map :output layer)
           net   (conj nn layer)]
-      (forward-propagate (rest layers) input :nn net))))
+      (forward-propagate (rest network) input :nn net))))
 
-(defn delta [neuron sum-error]
-  (assoc neuron :delta sum-error))
+(defn delta [neuron sum-error] (assoc neuron :delta sum-error))
 
 (defn backward-propagate
   ([->net expected-output]
@@ -54,13 +53,13 @@
         --derivs (conj (vec -derivs) (+ (last (:deriv neuron)) (* 1 (:delta neuron))))]
     (assoc neuron :deriv --derivs)))
 
-(defn error-derivatives [layers input & {:keys [nn] :or {nn []}}]
-  (if (empty? layers)
+(defn error-derivatives [network input & {:keys [nn] :or {nn []}}]
+  (if (empty? network)
     nn
-    (let [layer (map #(derivatives % input) (first layers))
+    (let [layer (map #(derivatives % input) (first network))
           input (map :output layer)
           net   (conj nn layer)]
-      (error-derivatives (rest layers) input :nn net))))
+      (error-derivatives (rest network) input :nn net))))
 
 (defn update-neuron [neuron lrate mrate]
   (let [deltas (map #(+ (* lrate %1) (* mrate %2)) (:deriv neuron) (:last-delta neuron))
