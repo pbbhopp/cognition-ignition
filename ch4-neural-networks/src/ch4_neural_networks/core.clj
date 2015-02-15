@@ -1,5 +1,4 @@
-(ns ch4-neural-networks.core
-  (:require [clojure.math.numeric-tower :as math]))
+(ns ch4-neural-networks.core)
 
 (defn rnd [] (+ (* (- 1.0 -1.0) (rand)) -1.0))
 
