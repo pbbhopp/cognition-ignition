@@ -37,8 +37,7 @@
         (forward-propagate (rest layers) input net)))))
 
 (defn delta [neuron sum-error]
-  (let [-neuron (assoc neuron :delta sum-error)]
-    -neuron))
+  (assoc neuron :delta sum-error))
 
 (defn backward-propagate
   ([->net expected-output]
