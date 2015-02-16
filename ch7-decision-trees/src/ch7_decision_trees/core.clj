@@ -20,7 +20,7 @@
     
 (defn find-best-feature-to-split [data-set]
   (let [entropy    (shannon-entropy data-set)
-        feat-list  (drop-last (transpose data-set))
+        feat-list  (distinct (drop-last (transpose data-set)))
         fn-prob    (fn [idx value] 
                      (let [sub-data-set (split-data-set data-set idx value)]
                        (* (/ (count sub-data-set) (count data-set)) (shannon-entropy sub-data-set))))
