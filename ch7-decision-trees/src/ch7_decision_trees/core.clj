@@ -3,6 +3,8 @@
 (defn log2 [n]
   (/ (Math/log n) (Math/log 2)))
 
+(defn del [vect idx] (concat (subvec vect 0 idx) (subvec vect (inc idx))))
+
 (defn shannon-entropy [data-set]
   (let [num-entries  (count data-set)
         label-counts (frequencies (map last data-set))
@@ -12,7 +14,7 @@
 
 (defn split-data-set [data-set axis value]
   (let [data (filter #(= (get % axis) value) data-set)
-        data (map #(concat (subvec % 0 axis) (subvec % (inc axis))) data)]
+        data (map #(del % axis) data)]
     data))  
 
 (defn transpose [coll]
@@ -29,3 +31,4 @@
         info-gains (map-indexed #(vector %1 (- entropy (fn-entrop %1 %2))) feat-list)
         best-feat  (first (last (sort-by second info-gains)))]
     best-feat)) 
+
