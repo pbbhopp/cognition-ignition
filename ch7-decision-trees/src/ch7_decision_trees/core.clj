@@ -33,18 +33,17 @@
     best-feat))
 
 (defn build-tree [data-set labels]
-  (let [classes (last (transpose data-set))]
+  (let [classes (flatten (last (transpose data-set)))]
     (cond
       (= (count (distinct classes)) 1) (first classes)
-      (= (count (first data-set)) 1) (first (last (sort-by second (frequencies (into [] classes)))))
+      (= (count (first data-set)) 1) (first (last (sort-by second (frequencies classes))))
       :else
         (let [best-feat (find-best-feature-to-split data-set)
-              best-lbl  (get labels best-feat)
-              dec-tree  (hash-map best-lbl {})
+              best-lbl  (get (vec labels) best-feat)
               features  (distinct (for [data data-set] (get data best-feat)))
-              dec-tree  (for [feat features]
-                          (assoc-in dec-tree [best-lbl feat]
-                            (build-tree
-                              (split-data-set data-set best-feat feat) (del (vec labels) best-feat))))]
+              dec-tree  (reduce
+                          #(assoc-in %1 [best-lbl %2]
+                            (build-tree (split-data-set data-set best-feat %2) (del (vec labels) best-feat)))
+                          {} features)]
           dec-tree))))
 
