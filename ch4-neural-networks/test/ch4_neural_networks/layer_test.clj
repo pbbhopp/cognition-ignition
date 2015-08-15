@@ -6,7 +6,7 @@
 
 (defn dsigmoid [y] (* y (- 1.0 y)))
 
-(def l (->Layer [[1 1] [2 2]] [0.0 0.0] [0.0 0.0]))
+(def l (->Layer [[1 1] [2 2]] [0.0 0.0] [0.25 0.5]))
 
 (deftest feed-test
   (testing "should feed"
@@ -29,3 +29,12 @@
       (is (= (count (first w)) 2))
       (is (= (:activations l) [0.0 0.0]))
       (is (= (:errors l) [0.0 0.0])))))
+
+(deftest update-weights-test
+  (testing "should update weights"
+    (let [out [5 5]
+          rate 0.1
+          layer (update-weights l out rate)
+          w (:weights layer)]
+      (is (= w [[1.125 1.125] [2.25 2.25]])))))
+      
