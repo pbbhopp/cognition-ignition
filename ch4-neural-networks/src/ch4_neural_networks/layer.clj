@@ -4,16 +4,16 @@
 
 (defn rnd [] (+ (* (- 1.0 -1.0) (rand)) -1.0))
 
-(defn make-vector [n f] (into [] (take n (repeatedly f))))
+(defn make-vector [inputs f] (into [] (take inputs (repeatedly f))))
 
-(defn make-layer [n m]
-  (->Layer (into [] (take n (repeatedly (partial make-vector m rnd))))
-           (make-vector n (fn [] 0.0))
-           (make-vector n (fn [] 0.0))))
+(defn make-layer [num-neurons inputs]
+  (->Layer (into [] (take num-neurons (repeatedly (partial make-vector inputs rnd))))
+           (make-vector num-neurons (fn [] 0.0))
+           (make-vector num-neurons (fn [] 0.0))))
            
-(defn feed [layer x f]
+(defn feed [layer inputs f]
   (let [w    (:weights layer)
-        coll (map #(reduce + (map (fn [a b] (* a b)) %1 %2)) w x)]
+        coll (map #(reduce + (map (fn [a b] (* a b)) inputs %)) w)]
     (map f coll)))
 
 (defn backprop [layer v s df]
