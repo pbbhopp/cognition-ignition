@@ -14,7 +14,7 @@
 (defn feed [layer inputs f]
   (let [w    (:weights layer)
         coll (map #(reduce + (map (fn [a b] (* a b)) inputs %)) w)]
-    (map f coll)))
+    (assoc layer :activations (map f coll))))
 
 (defn backprop [layer v s df]
   (let [w   (:weights layer)

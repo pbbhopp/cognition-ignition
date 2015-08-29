@@ -9,8 +9,7 @@
 (defn make-nn [dims rate]
   (->NN (make-layers dims) rate))
 
-(defn forward-prop [nn x f]
-  (let [ls (:layers nn)
-         _ (println (:weights (first ls)))
-        v  (feed (first ls) x f)] 
-    (reduce #(feed %2 %1 f) v (rest ls))))
+(defn forward-prop [nn inputs f]
+  (let [ls  (:layers nn)
+        out (feed (first ls) inputs f)] 
+    (reduce #(feed %2 %1 f) out (rest ls))))
