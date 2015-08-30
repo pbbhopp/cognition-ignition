@@ -6,7 +6,7 @@
 
 (defn dsigmoid [y] (* y (- 1.0 y)))
 
-(def l (->Layer [[1 1] [2 2]] [0.0 0.0] [0.25 0.5]))
+(def l (->Layer [[1 1] [2 2]] [0.0 0.0] [0.25 0.5] [0.1 0.1]))
 
 (deftest feed-test
   (testing "should feed"
@@ -17,8 +17,9 @@
 (deftest backprop-test
   (testing "should backprop"
     (let [v [2 2]
-          s [1 1]]
-	  (is (= (backprop l v s dsigmoid) '(-4.0 -8.0))))))
+          s [1 1]
+          l (backprop l v s dsigmoid)]
+	  (is (= (:deltas l) '(-4.0 -8.0))))))
 
 (deftest make-layer-test
   (testing "should make layer"
