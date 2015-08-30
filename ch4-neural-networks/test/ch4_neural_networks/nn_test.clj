@@ -14,7 +14,15 @@
 (deftest forward-prop-test
   (testing "should forward propogate neural network"
     (let [x [1 1] 
-          y [1]
           v 0.8534092045709026
           n (forward-prop nn x sigmoid)]
 	  (is (= (:activations (last (:layers n))) '(v v))))))
+
+(deftest train-test
+  (testing "should train neural network"
+    (let [x [1 1] 
+          y [1]
+          v 0.8534092045709026
+	  n (train nn x y sigmoid dsigmoid)]
+      (is (= n [])))))
+
