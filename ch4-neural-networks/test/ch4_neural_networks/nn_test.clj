@@ -7,14 +7,14 @@
 
 (defn dsigmoid [y] (* y (- 1.0 y)))
 
-(def l1 (->Layer [[1 1] [1 1]] [0.0 0.0] [0.0 0.0]))
-(def l2 (->Layer [[1 1] [1 1]] [0.0 0.0] [0.0 0.0]))
+(def l1 (->Layer [[1 1] [1 1]] [0.0 0.0] [0.0 0.0] [0.0 0.0]))
+(def l2 (->Layer [[1 1] [1 1]] [0.0 0.0] [0.0 0.0] [0.0 0.0]))
 (def nn (->NN [l1 l2] 0.1))
 
 (deftest forward-prop-test
   (testing "should forward propogate neural network"
     (let [x [1 1] 
           y [1]
-          v 0.8534092045709026]
-	  (is (= (forward-prop nn x sigmoid) '(v v))))))
-
+          v 0.8534092045709026
+          n (forward-prop nn x sigmoid)]
+	  (is (= (:activations (last (:layers n))) '(v v))))))

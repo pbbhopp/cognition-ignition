@@ -11,5 +11,10 @@
 
 (defn forward-prop [nn inputs f]
   (let [ls  (:layers nn)
-        out (feed (first ls) inputs f)] 
-    (reduce #(feed %2 %1 f) out (rest ls))))
+        out (feed (first ls) inputs f)
+        ls  (reduce #(conj %1 (feed %2 (:activations (last %1)) f)) [out] (rest ls))]
+    (assoc nn :layers ls)))
+
+;(defn train [nn x y f]
+;  (let [out ]
+;    )
