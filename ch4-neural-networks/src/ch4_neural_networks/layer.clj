@@ -17,10 +17,10 @@
         coll (map #(reduce + (map * inputs %)) w)]
     (assoc layer :activations (map f coll))))
 
-(defn backprop [layer v s df]
+(defn backprop [layer errs df]
   (let [w   (:weights layer)
-        err (map #(* %1 %2) s (map df v))]
-    (assoc layer :deltas (map #(reduce + (map * err %)) w))))
+        e (map #(* %1 %2) errs (map df (:activations layer)))]
+    (assoc layer :deltas (map #(reduce + (map * e %)) w))))
 
 (defn update-weights [layer out rate]
   (let [w (:weights layer)

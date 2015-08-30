@@ -15,6 +15,3 @@
         ls  (reduce #(conj %1 (feed %2 (:activations (last %1)) f)) [out] (rest ls))]
     (assoc nn :layers ls)))
 
-;(defn train [nn x y f]
-;  (let [out ]
-;    )
