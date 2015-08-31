@@ -22,9 +22,13 @@
         ls  (update-layers (vector out) (rest ls) (feed-layer-fn f))]
     (assoc nn :layers ls)))
 
+(defn- backprop-fn [derivative-fn]
+  (fn [updated-layers layer] 
+    (backprop layer (:deltas (first updated-layers)) derivative-fn)))
+
 (defn train [nn x y f df]
   (let [out  (:activations (last (:layers (forward-prop nn x f))))
         err  (map - y out)
         bck  (backprop (last (:layers nn)) err df) 
-        corr (update-layers (list bck) (rest (reverse (:layers nn))) (fn [a l] (backprop l (:deltas (first a)) f)))]
+        corr (update-layers (list bck) (rest (reverse (:layers nn))) (backprop-fn df))]
     (assoc nn :layers (into [] corr))))
