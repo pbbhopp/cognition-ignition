@@ -12,10 +12,14 @@
 (defn- update-layers [agg layers f]
   (reduce #(conj %1 (f %1 %2)) agg layers))
 
+(defn- feed-layer-fn [activation-fn]
+  (fn [updated-layers layer] 
+    (feed layer (:activations (last updated-layers)) activation-fn)))
+
 (defn forward-prop [nn inputs f]
   (let [ls  (:layers nn)
         out (feed (first ls) inputs f)
-        ls  (update-layers (vector out) (rest ls) (fn [a l] (feed l (:activations (last a)) f)))]
+        ls  (update-layers (vector out) (rest ls) (feed-layer-fn f))]
     (assoc nn :layers ls)))
 
 (defn train [nn x y f df]

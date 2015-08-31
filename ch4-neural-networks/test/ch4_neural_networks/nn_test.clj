@@ -16,7 +16,7 @@
     (let [x [1 1] 
           v 0.8534092045709026
           n (forward-prop nn x sigmoid)]
-	  (is (= (:activations (last (:layers n))) '(v v))))))
+	  (is (= (:activations (last (:layers n))) (list v v))))))
 
 (deftest train-test
   (testing "should train neural network"
