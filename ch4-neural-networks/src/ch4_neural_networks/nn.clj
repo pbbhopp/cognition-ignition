@@ -15,12 +15,12 @@
 (defn forward-prop [nn inputs f]
   (let [ls  (:layers nn)
         out (feed (first ls) inputs f)
-        ls  (update-layers [out] (rest ls) (fn [a l] (feed l (:activations (last a)) f)))]
+        ls  (update-layers (vector out) (rest ls) (fn [a l] (feed l (:activations (last a)) f)))]
     (assoc nn :layers ls)))
 
 (defn train [nn x y f df]
   (let [out  (:activations (last (:layers (forward-prop nn x f))))
         err  (map - y out)
         bck  (backprop (last (:layers nn)) err df) 
-        corr (update-layers '(bck) (rest (reverse (:layers nn))) (fn [a l] (backprop l (:deltas (first a)) f)))]
+        corr (update-layers (list bck) (rest (reverse (:layers nn))) (fn [a l] (backprop l (:deltas (first a)) f)))]
     (assoc nn :layers (into [] corr))))
