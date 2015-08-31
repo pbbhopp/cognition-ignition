@@ -9,15 +9,18 @@
 (defn make-nn [dims rate]
   (->NN (make-layers dims) rate))
 
+(defn- update-layers [agg layers f]
+  (reduce #(conj %1 (f %1 %2)) agg layers))
+
 (defn forward-prop [nn inputs f]
   (let [ls  (:layers nn)
         out (feed (first ls) inputs f)
-        ls  (reduce #(conj %1 (feed %2 (:activations (last %1)) f)) [out] (rest ls))]
+        ls  (update-layers [out] (rest ls) (fn [a l] (feed l (:activations (last a)) f)))]
     (assoc nn :layers ls)))
 
 (defn train [nn x y f df]
   (let [out  (:activations (last (:layers (forward-prop nn x f))))
         err  (map - y out)
         bck  (backprop (last (:layers nn)) err df) 
-        corr (reduce #(conj %1 (backprop %2 (:deltas (first %1)) f)) '(bck) (reverse (drop-last (:layers nn))))]
+        corr (update-layers '(bck) (rest (reverse (:layers nn))) (fn [a l] (backprop l (:deltas (first a)) f)))]
     (assoc nn :layers (into [] corr))))
