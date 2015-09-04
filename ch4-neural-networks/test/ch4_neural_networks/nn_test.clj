@@ -26,3 +26,13 @@
 	  n (train nn x y sigmoid dsigmoid)]
       (is (= n [])))))
 
+(def l3 (->Layer [[0.1 0.2] [0.3 0.4] [0.5 0.6]] [0.0 0.0 0.0] [0.0 0.0 0.0] [0.0 0.0 0.0]))
+(def l4 (->Layer [[0.5 0.2 0.3]] [0.0] [0.0] [0.0]))
+(def nnet (->NN [l3 l4] 0.25))
+
+(deftest real-test
+  (testing "should train neural network"
+    (let [x [[1 1] [1 0] [0 1] [0 0]] 
+          y [[0] [1] [1] [0]]
+	  n (reduce #(train %1 (first %2) (last %2) sigmoid dsigmoid) nnet (map #(list %1 %2) x y))]
+      (is (= n [])))))

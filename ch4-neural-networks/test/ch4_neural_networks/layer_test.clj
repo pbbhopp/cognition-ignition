@@ -39,3 +39,10 @@
           w (:weights layer)]
       (is (= w [[1.125 1.125] [2.25 2.25]])))))
       
+(def ll (->Layer [[1 1]] [2.0] [0.25] [0.1]))
+
+(deftest feed-test2
+  (testing "should feed"
+    (let [x [1 1]
+          l (feed ll x sigmoid)]
+      (is (= (:activations l) (map sigmoid '(2 4)))))))
