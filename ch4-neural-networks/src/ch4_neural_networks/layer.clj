@@ -1,6 +1,6 @@
 (ns ch4-neural-networks.layer)
   
-(defrecord Layer [weights activations errors deltas])
+(defrecord Layer [weights activations errors deltas bias])
 
 (defn rnd [] (+ (* (- 1.0 -1.0) (rand)) -1.0))
 
@@ -10,17 +10,24 @@
   (->Layer (into [] (take num-neurons (repeatedly (partial make-vector inputs rnd))))
            (make-vector num-neurons (fn [] 0.0))
            (make-vector num-neurons (fn [] 0.0))
+           (make-vector num-neurons (fn [] 0.0))
            (make-vector num-neurons (fn [] 0.0))))
+
+(defn- inputs-with-bias [inputs bias]
+  (let [offset (- (count bias) (count inputs))]
+    (first (map-indexed #(update-in bias [(+ %1 offset)] + %2) inputs))))
            
 (defn feed [layer inputs f]
-  (let [w    (:weights layer)
-        coll (map #(reduce + (map * inputs %)) w)]
-    (assoc layer :activations (map f coll))))
+  (let [w (:weights layer)
+        x (if (nil? (:bias layer)) inputs (inputs-with-bias inputs (:bias layer)))
+        v (map #(reduce + (map * x %)) w)]
+    (assoc layer :activations (mapv f v))))
 
-(defn backprop [layer errs df]
-  (let [w   (:weights layer)
-        e (map #(* %1 %2) errs (map df (:activations layer)))]
-    (assoc layer :deltas (map #(reduce + (map * e %)) w))))
+(defn backprop [layer in df]
+  (let [w (:weights layer)
+        e (mapv #(* %1 %2) in (map df (:activations layer)))
+        l (assoc layer :errors e)]
+    (assoc l :deltas (mapv #(reduce + (map * e %)) w))))
 
 (defn update-weights [layer out rate]
   (let [w (:weights layer)

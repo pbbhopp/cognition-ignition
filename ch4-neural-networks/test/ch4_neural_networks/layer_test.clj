@@ -6,7 +6,7 @@
 
 (defn dsigmoid [y] (* y (- 1.0 y)))
 
-(def l (->Layer [[1 1] [2 2]] [2.0 2.0] [0.25 0.5] [0.1 0.1]))
+(def l (->Layer [[1 1] [2 2]] [2.0 2.0] [0.25 0.5] [0.1 0.1] nil))
 
 (deftest feed-test
   (testing "should feed"
@@ -39,7 +39,7 @@
           w (:weights layer)]
       (is (= w [[1.125 1.125] [2.25 2.25]])))))
       
-(def ll (->Layer [[1 1]] [2.0] [0.25] [0.1]))
+(def ll (->Layer [[1 1]] [2.0] [0.25] [0.1] nil))
 
 (deftest feed-test2
   (testing "should feed"
