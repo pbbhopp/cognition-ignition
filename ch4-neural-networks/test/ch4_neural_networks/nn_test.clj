@@ -49,4 +49,5 @@
           nn (->NN [l1 l2] 0.2)
            x [0 0] 
           nn (forward-prop nn x sigmoid)]
-      (is (= (:activations (first (:layers nn))) [0.5844897593895427 0.4712260773225621])))))
+      (is (= (:activations (first (:layers nn))) [0.5844897593895427 0.4712260773225621]))
+      (is (= (:activations (last (:layers nn))) [0.3676098854895219])))))

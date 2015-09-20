@@ -15,8 +15,8 @@
 
 (defn- inputs-with-bias [inputs bias]
   (let [offset (- (count bias) (count inputs))]
-    (first (map-indexed #(update-in bias [(+ %1 offset)] + %2) inputs))))
-           
+    (reduce #(update-in %1 [(+ (first %2) offset)] + (second %2)) bias (map-indexed #(vector %1 %2) inputs)))) 
+
 (defn feed [layer inputs f]
   (let [w (:weights layer)
         x (if (nil? (:bias layer)) inputs (inputs-with-bias inputs (:bias layer)))
