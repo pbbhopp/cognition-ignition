@@ -28,7 +28,7 @@
 
 (defn train [nn x y f df]
   (let [out  (:activations (last (:layers (forward-prop nn x f))))
-        err  (map #(* %2 (- 1 %2) (- %1 %2)) y out)
+        err  (map - y out)
 	bck  (backprop (last (:layers nn)) err df) 
 	corr (update-layers (list bck) (rest (reverse (:layers nn))) (backprop-fn df))]
     (assoc nn :layers (into [] corr))))
