@@ -31,8 +31,7 @@
     (assoc l :deltas (mapv #(reduce + (map * e %)) w))))
 
 (defn update-weights [layer out rate]
-  (let [w (:weights layer)
-        e (:errors layer)
+  (let [{w :weights e :errors} layer
         deltas (map #(map (partial * rate %) out) e)
         w (mapv #(mapv + %1 %2) w deltas)]
     (assoc layer :weights w)))
