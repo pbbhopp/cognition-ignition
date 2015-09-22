@@ -14,9 +14,10 @@
            (make-vector num-neurons (fn [] 0.0))))
 
 (defn- inputs-with-bias [inputs bias]
-  (let [offset (- (count bias) (count inputs))]
+  (let [offset (- (count bias) (count inputs))
+        add-fn (fn [bias [idx v]] (update-in bias [(+ offset idx)] + v))]
     (->> (map-indexed #(vector %1 %2) inputs) 
-         (reduce #(update-in %1 [(+ (first %2) offset)] + (second %2)) bias)))) 
+         (reduce #(add-fn %1 %2) bias)))) 
 
 (defn feed [layer inputs f]
   (let [w (:weights layer)
