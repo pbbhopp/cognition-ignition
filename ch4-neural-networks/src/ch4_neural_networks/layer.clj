@@ -20,8 +20,8 @@
          (reduce #(add-fn %1 %2) bias)))) 
 
 (defn feed [layer inputs f]
-  (let [w (:weights layer)
-        x (if (nil? (:bias layer)) inputs (inputs-with-bias inputs (:bias layer)))
+  (let [{b :bias w :weights} layer
+        x (if (nil? b) inputs (inputs-with-bias inputs b))
         v (map #(reduce + (map * x %)) w)]
     (assoc layer :activations (mapv f v))))
 
