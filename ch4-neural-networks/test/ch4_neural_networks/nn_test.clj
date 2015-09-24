@@ -30,5 +30,22 @@
            x [0 0]
           nn (forward-prop nn x sigmoid)
           l2 (last (:layers nn))
-          l2 (backprop l2 [0.3676098854895219] dsigmoid)]
-      (is (= (:deltas l2) [-0.0848972546030838])))))
+          l2 (backprop l2 [0.3676098854895219] dsigmoid)
+          l1 (first (:layers nn))
+          l1 (backprop l1 [-0.0848972546030838] dsigmoid)]
+      (is (= (:deltas l2) [-0.0848972546030838]))
+      (is (= (:deltas l1) [-0.007035614514673708 0.002375699263915016])))))
+
+(deftest train-test
+  (testing "should train neural network with correct calculations"
+    (let [l1 (->Layer [[0.341232 0.129952 -0.923123] [-0.115223 0.570345 -0.328932]] [0 0 0] [0 0 0] [0 0 0] [1 0 0])
+          l2 (->Layer [[-0.993423 0.164732 0.752621]] [0 0 0] [0 0 0] [0 0 0] [1 0 0])
+          nn (->NN [l1 l2] 0.5)
+           x [0 0]
+           y [0]
+          nn (train nn x y sigmoid dsigmoid)
+          l2 (last (:layers nn))
+          l1 (first (:layers nn))]
+      (is (= (:deltas l2) [0.0848972546030838]))
+      (is (= (:deltas l1) [0.007035614514673708 -0.002375699263915016])))))
+

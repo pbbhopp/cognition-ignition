@@ -27,7 +27,8 @@
     (backprop layer (:deltas (first updated-layers)) derivative-fn)))
 
 (defn train [nn x y f df]
-  (let [out  (:activations (last (:layers (forward-prop nn x f))))
+  (let [nn   (forward-prop nn x f)
+        out  (:activations (last (:layers nn)))
         err  (map - y out)
 	bck  (backprop (last (:layers nn)) err df) 
 	corr (update-layers (list bck) (rest (reverse (:layers nn))) (backprop-fn df))]

@@ -45,4 +45,4 @@
   (testing "should feed"
     (let [x [1 1]
           l (feed ll x sigmoid)]
-      (is (= (:activations l) (map sigmoid '(2 4)))))))
+      (is (= (:activations l) (map sigmoid [0.8807970779778823]))))))
