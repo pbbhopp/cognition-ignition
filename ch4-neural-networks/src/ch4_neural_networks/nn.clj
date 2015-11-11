@@ -1,35 +1,32 @@
-(ns ch4-neural-networks.nn
-  (:require [ch4-neural-networks.layer :refer :all]))
+(ns ch4-neural-networks.nn)
 
-(defrecord NN [layers learn-rate])
+(defrecord Neuron [weights last-delta deriv])
 
-(defn make-layers [dims]
-  (mapv #(make-layer (first %) (second %)) dims))
+(defn rnd [] (+ (* (- 1.0 -1.0) (rand)) -1.0))
 
-(defn make-nn [dims rate]
-  (->NN (make-layers dims) rate))
+(defn make-vector [num-inputs f] (into [] (take num-inputs (repeatedly f))))
 
-(defn- update-layers [agg layers f]
-  (reduce #(conj %1 (f %1 %2)) agg layers))
+(defn make-neuron [num-inputs]
+  (->Neuron (make-vector (inc num-inputs) rnd)
+            (make-vector (inc num-inputs) (fn [] 0.0))
+            (make-vector (inc num-inputs) (fn [] 0.0))))
 
-(defn- feed-layer-fn [activation-fn]
-  (fn [updated-layers layer] 
-    (feed layer (:activations (last updated-layers)) activation-fn)))
+(defn activate [weights input-vector]
+  (let [init (* (last weights) 1)
+        coll (map * (drop-last weights) input-vector)]
+    (reduce + init coll)))
 
-(defn forward-prop [nn inputs f]
-  (let [ls  (:layers nn)
-        out (feed (first ls) inputs f)
-        ls  (update-layers (vector out) (rest ls) (feed-layer-fn f))]
-    (assoc nn :layers ls)))
+(defn update-neuron [neuron input f]
+  (-> neuron
+      (assoc :activation (activate (:weights neuron) input))
+      (assoc :output (f (:activation neuron)))))
 
-(defn- backprop-fn [derivative-fn]
-  (fn [updated-layers layer] 
-    (backprop layer (:deltas (first updated-layers)) derivative-fn)))
+(defn forward-propagate [nn input-vector f]
+  (let [out-fn (fn [layer] (mapv :output layer))
+        inputs (reduce #(conj %1 (out-fn %2)) (vector input-vector) (drop-last nn))
+        lay-fn (fn [layer input f] (mapv #(update-neuron % input f) layer))
+        nn     (mapv #(lay-fn %1 %2 f) nn inputs)]
+    (:output (first (last nn)))))
 
-(defn train [nn x y f df]
-  (let [nn   (forward-prop nn x f)
-        out  (:activations (last (:layers nn)))
-        err  (map - y out)
-	bck  (backprop (last (:layers nn)) err df) 
-	corr (update-layers (list bck) (rest (reverse (:layers nn))) (backprop-fn df))]
-    (assoc nn :layers (into [] corr))))
+
+

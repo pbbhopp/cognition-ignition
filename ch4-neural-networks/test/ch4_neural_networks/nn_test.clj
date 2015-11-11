@@ -1,51 +1,24 @@
 (ns ch4-neural-networks.nn-test
   (:require [clojure.test :refer :all]
-            [ch4-neural-networks.layer :refer :all]
             [ch4-neural-networks.nn :refer :all]))
 
 (defn sigmoid [x] (/ 1.0 (+ 1.0 (Math/exp (* -1.0 x)))))
 
 (defn dsigmoid [y] (* y (- 1.0 y)))
 
-;
-; Test case values were taken from http://www.generation5.org/content/2001/xornet.asp.
-; You can go there to cross-validate test results below.
-;
+(def nn [[{:weights [0.02062429003326055 0.3435545438096753 0.5704151456736803]
+           :last_delta [0.0 0.0 0.0] :deriv [0.0 0.0  0.0] :activation 0.5704151456736803 :output 0.6388589623271096}
+          {:weights [0.10871857288071629  0.4449524922353063  -0.1832750222077525]
+           :last_delta [0.0 0.0 0.0] :deriv [0.0 0.0 0.0] :activation -0.1832750222077525 :output 0.45430906842459423}
+          {:weights [0.11848174842917547 0.01402578209170834 0.4465007733452825]
+           :last_delta [0.0 0.0 0.0] :deriv [0.0 0.0 0.0] :activation 0.4465007733452825 :output 0.6098069400845292}
+          {:weights [-0.42056743700655  0.14937038322015017  -0.098205682489091]
+           :last_delta [0.0 0.0 0.0] :deriv [0.0 0.0 0.0] :activation -0.098205682489091 :output 0.47546829225302856}]
+         [{:weights [-0.7977182602187687 0.1718961033660047 -0.06964779721310455 -0.1943098215433533 -0.23595593944507165]
+           :last_delta [0.0 0.0 0.0 0.0 0.0] :deriv [0.0 0.0 0.0 0.0 0.0] :activation -0.8023513099311541 :output 0.3095227756800094}]])
 
 (deftest forward-propagate-test
   (testing "should forward propagate neural network with correct outputs and activations"
-    (let [l1 (->Layer [[0.341232 0.129952 -0.923123] [-0.115223 0.570345 -0.328932]] [0 0 0] [0 0 0] [0 0 0] [1 0 0])
-          l2 (->Layer [[-0.993423 0.164732 0.752621]] [0 0 0] [0 0 0] [0 0 0] [1 0 0])
-          nn (->NN [l1 l2] 0.5)
-           x [0 0] 
-          nn (forward-prop nn x sigmoid)]
-      (is (= (:activations (first (:layers nn))) [0.5844897593895427 0.4712260773225621]))
-      (is (= (:activations (last (:layers nn))) [0.3676098854895219])))))
-
-(deftest backward-propagate-test
-  (testing "should backward propagate neural network with correct delta calculations"
-    (let [l1 (->Layer [[0.341232 0.129952 -0.923123] [-0.115223 0.570345 -0.328932]] [0 0 0] [0 0 0] [0 0 0] [1 0 0])
-          l2 (->Layer [[-0.993423 0.164732 0.752621]] [0 0 0] [0 0 0] [0 0 0] [1 0 0])
-          nn (->NN [l1 l2] 0.5)
-           x [0 0]
-          nn (forward-prop nn x sigmoid)
-          l2 (last (:layers nn))
-          l2 (backprop l2 [0.3676098854895219] dsigmoid)
-          l1 (first (:layers nn))
-          l1 (backprop l1 [-0.0848972546030838] dsigmoid)]
-      (is (= (:deltas l2) [-0.0848972546030838]))
-      (is (= (:deltas l1) [-0.007035614514673708 0.002375699263915016])))))
-
-(deftest train-test
-  (testing "should train neural network with correct calculations"
-    (let [l1 (->Layer [[0.341232 0.129952 -0.923123] [-0.115223 0.570345 -0.328932]] [0 0 0] [0 0 0] [0 0 0] [1 0 0])
-          l2 (->Layer [[-0.993423 0.164732 0.752621]] [0 0 0] [0 0 0] [0 0 0] [1 0 0])
-          nn (->NN [l1 l2] 0.5)
-           x [0 0]
-           y [0]
-          nn (train nn x y sigmoid dsigmoid)
-          l2 (last (:layers nn))
-          l1 (first (:layers nn))]
-      (is (= (:deltas l2) [0.0848972546030838]))
-      (is (= (:deltas l1) [0.007035614514673708 -0.002375699263915016])))))
+    (let [output (forward-propagate nn [0.0 0.0] sigmoid)]
+      (is (= output 0.3095227756800094)))))
 
