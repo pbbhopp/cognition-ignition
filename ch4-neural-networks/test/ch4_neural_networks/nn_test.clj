@@ -1,6 +1,7 @@
 (ns ch4-neural-networks.nn-test
   (:require [clojure.test :refer :all]
-            [ch4-neural-networks.nn :refer :all]))
+            [ch4-neural-networks.nn :refer :all])
+  (:use [clojure.pprint]))
 
 (defn sigmoid [x] (/ 1.0 (+ 1.0 (Math/exp (* -1.0 x)))))
 
@@ -18,7 +19,12 @@
            :last_delta [0.0 0.0 0.0 0.0 0.0] :deriv [0.0 0.0 0.0 0.0 0.0] :activation -0.8023513099311541 :output 0.3095227756800094}]])
 
 (deftest forward-propagate-test
-  (testing "should forward propagate neural network with correct outputs and activations"
+  (testing "should forward propagate neural network with correct output"
     (let [output (forward-propagate nn [0.0 0.0] sigmoid)]
       (is (= output 0.3095227756800094)))))
 
+(deftest backward-propagate-test
+  (testing "should backward propagate neural network with correct deltas"
+    (let [nn (backward-propagate nn 0.0 dsigmoid)]
+      (is (= (:delta (first (last nn))) -0.06615072074375726))
+      (is (= (mapv :delta (first nn)) [0.012174915260063871 -0.002819023880106377 0.0010962607598879325 0.003205698247883244])))))

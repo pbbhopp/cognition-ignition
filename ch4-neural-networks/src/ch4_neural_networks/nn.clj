@@ -16,7 +16,7 @@
         coll (map * (drop-last weights) input-vector)]
     (reduce + init coll)))
 
-(defn update-neuron [neuron input f]
+(defn- update-neuron [neuron input f]
   (-> neuron
       (assoc :activation (activate (:weights neuron) input))
       (assoc :output (f (:activation neuron)))))
@@ -28,5 +28,19 @@
         nn     (mapv #(lay-fn %1 %2 f) nn inputs)]
     (:output (first (last nn)))))
 
+(defmulti update-layer (fn [nn idx ex df] (if (= (last nn) (get nn idx)) :last :other)))
 
+(defmethod update-layer :last [nn idx ex df]
+  (let [out (get-in nn [idx 0 :output])
+        err (- ex out)]
+    (assoc-in nn [idx 0 :delta] (* err (df out)))))
 
+(defmethod update-layer :other [nn idx _ df]
+  (let [m (fn [layer k] (map #(* (get-in % [:weights k]) (get % :delta)) layer))
+        s (fn [nn k] (reduce + (m (get nn (inc idx)) k)))
+        f (fn [nn k] (assoc-in nn [idx k :delta] (* (s nn k) (df (get-in nn [idx k :output])))))]
+    (reduce #(f %1 %2) nn (range (count (get nn idx))))))
+
+(defn backward-propagate [nn expected-output df]
+  (let [index (reverse (range (count nn)))]
+    (reduce #(update-layer %1 %2 expected-output df) nn index)))
