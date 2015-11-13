@@ -28,3 +28,9 @@
     (let [nn (backward-propagate nn 0.0 dsigmoid)]
       (is (= (:delta (first (last nn))) -0.06615072074375726))
       (is (= (mapv :delta (first nn)) [0.012174915260063871 -0.002819023880106377 0.0010962607598879325 0.003205698247883244])))))
+
+(deftest calc-err-derivatives-for-weights-test
+  (testing "should backward propagate neural network with correct deltas"
+    (let [nn (calc-err-derivative nn [0.0 0.0])]
+      (is (= (:deriv (first (last nn))) [-0.042260980811547166 -0.030052872316711842 -0.04033916860113681 -0.031452570223341254 -0.06615072074375726]))
+      (is (= (mapv :delta (first nn)) [[0.0 0.0 0.012174915260063871] [0.0 0.0 -0.002819023880106377] [0.0 0.0 0.0010962607598879325] [0.0 0.0 0.003205698247883244]])))))
