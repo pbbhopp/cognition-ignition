@@ -1,4 +1,5 @@
-(ns ch4-neural-networks.nn)
+(ns ch4-neural-networks.nn
+  (:use [clojure.pprint]))
 
 (defrecord Neuron [weights last-delta deriv])
 
@@ -44,3 +45,14 @@
 (defn backward-propagate [nn expected-output df]
   (let [index (reverse (range (count nn)))]
     (reduce #(update-layer %1 %2 expected-output df) nn index)))
+
+(defn calc-err-derivatives [nn input-vector]
+  (let [inputs  (concat (vector input-vector) (mapv #(mapv (fn [n] (:output n)) %) (drop-last nn)))
+        inputs  (mapv #(concat % [1]) inputs)
+        deriv-f (fn [deriv delta input] (mapv + (map #(* % delta) input) deriv))
+        assoc-f (fn [nn l-idx n-idx]
+                  (let [neuron (get-in nn [l-idx n-idx])]
+                    (assoc-in nn [l-idx n-idx :deriv]
+                              (deriv-f (:deriv neuron) (:delta neuron) (get inputs l-idx)))))
+        layer-f (fn [nn l-idx] (reduce #(assoc-f %1 l-idx %2) nn (range (count (get nn l-idx)))))]
+    (reduce #(layer-f %1 %2) nn (range (count nn)))))
