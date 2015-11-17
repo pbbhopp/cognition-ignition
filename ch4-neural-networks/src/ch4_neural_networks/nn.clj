@@ -56,3 +56,16 @@
                               (deriv-f (:deriv neuron) (:delta neuron) (get inputs l-idx)))))
         layer-f (fn [nn l-idx] (reduce #(assoc-f %1 l-idx %2) nn (range (count (get nn l-idx)))))]
     (reduce #(layer-f %1 %2) nn (range (count nn)))))
+
+(defn update-weights [nn lr m]
+  (let [delta-f (fn [neuron]
+                  (map + (map #(* lr %) (:deriv neuron)) (map #(* m %) (:last-delta neuron))))
+        assoc-f (fn [nn l-idx n-idx]
+                  (let [neuron (get-in nn [l-idx n-idx])
+                        delta  (delta-f neuron)]
+                    (-> nn
+                        (assoc-in [l-idx n-idx :weights] (mapv + (:weights neuron) delta))
+                        (assoc-in [l-idx n-idx :last-delta] delta)
+                        (assoc-in [l-idx n-idx :deriv] 0))))
+        layer-f (fn [nn l-idx] (reduce #(assoc-f %1 l-idx %2) nn (range (count (get nn l-idx)))))]
+    (reduce #(layer-f %1 %2) nn (range (count nn)))))
