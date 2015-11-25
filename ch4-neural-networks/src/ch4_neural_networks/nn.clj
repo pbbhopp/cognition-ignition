@@ -1,22 +1,15 @@
 (ns ch4-neural-networks.nn
   (:use [clojure.pprint]))
 
-(defn activate [weights input-vector]
-  (let [init (* (last weights) 1)
-        coll (map * (drop-last weights) input-vector)]
-    (reduce + init coll)))
+(defn dot [v w] (reduce + (map * v w)))
 
-(defn- update-neuron [neuron input f]
-  (-> neuron
-      (assoc :activation (activate (:weights neuron) input))
-      (assoc :output (f (:activation neuron)))))
+(defn activate [weights input-vector activate-fn] (activate-fn (dot weights input-vector)))
 
-(defn forward-propagate [nn input-vector f]
-  (let [out-fn (fn [layer] (mapv :output layer))
-        inputs (reduce #(conj %1 (out-fn %2)) (vector input-vector) (drop-last nn))
-        lay-fn (fn [layer input f] (mapv #(update-neuron % input f) layer))
-        nn     (mapv #(lay-fn %1 %2 f) nn inputs)]
-    (:output (first (last nn)))))
+(defn forward-propagate [nn input-vector activate-fn]
+  (let [activate-fn (fn [outputs layer]
+                      (let [biased-input (conj (last outputs) 1)]
+                        (for [neuron layer] (activate neuron biased-input activate-fn))))]
+    (rest (reduce #(conj %1 (activate-fn %1 %2)) (vector input-vector) nn))))
 
 (defmulti update-layer (fn [nn idx ex df] (if (= (last nn) (get nn idx)) :last :other)))
 
@@ -58,3 +51,14 @@
                         (assoc-in [l-idx n-idx :deriv] 0))))
         layer-f (fn [nn l-idx] (reduce #(assoc-f %1 l-idx %2) nn (range (count (get nn l-idx)))))]
     (reduce #(layer-f %1 %2) nn (range (count nn)))))
+
+(defn train-network [nn domain lrate mom f df]
+  (let [input (vec (drop-last domain))
+        expected (get domain 2)
+        f  (fn [net input]
+             (let [_   (forward-propagate net input f)
+                   net (backward-propagate net expected df)]
+               (calc-err-derivatives nn input)))
+        nn (reduce #(f %1 %2) nn domain)]
+    (update-weights nn lrate mom)))
+
