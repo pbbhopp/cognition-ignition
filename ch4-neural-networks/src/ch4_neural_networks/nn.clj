@@ -1,17 +1,6 @@
 (ns ch4-neural-networks.nn
   (:use [clojure.pprint]))
 
-(defrecord Neuron [weights last-delta deriv])
-
-(defn rnd [] (+ (* (- 1.0 -1.0) (rand)) -1.0))
-
-(defn make-vector [num-inputs f] (into [] (take num-inputs (repeatedly f))))
-
-(defn make-neuron [num-inputs]
-  (->Neuron (make-vector (inc num-inputs) rnd)
-            (make-vector (inc num-inputs) (fn [] 0.0))
-            (make-vector (inc num-inputs) (fn [] 0.0))))
-
 (defn activate [weights input-vector]
   (let [init (* (last weights) 1)
         coll (map * (drop-last weights) input-vector)]
