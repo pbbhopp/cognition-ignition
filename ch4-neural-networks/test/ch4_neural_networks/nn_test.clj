@@ -7,11 +7,11 @@
 
 (defn dsigmoid [y] (* y (- 1.0 y)))
 
-(def nn [
-          [[0.02062429003326055 0.3435545438096753  0.5704151456736803]
-           [0.10871857288071629 0.4449524922353063 -0.1832750222077525]]
-
-          [[-0.7977182602187687 0.1718961033660047 -0.06964779721310455]]])
+(def nn [; hidden layer
+         [[2 2 -3] ; 'and' neuron
+         [2 2 -1]] ; 'or' neuron
+         ; output layer
+         [[-6 6 -3]]])
 
 (deftest forward-propagate-test
   (testing "should forward propagate neural network with correct output"
@@ -21,4 +21,8 @@
 (deftest backward-propagate-test
  (testing "should backward propagate neural network with correct deltas"
   (let [nn (backward-propagate nn [0 0] [0] sigmoid dsigmoid)]
-   (is (= nn [])))))
+   (is (= nn [; hidden layer with updated weights
+               [[2.0 2.0 -2.994281613967575]  ; 'and' neuron
+               [2.0 2.0 -1.0248591356248118]] ; 'or' neuron
+              ; output layer with updated weights
+              [[-6.001000347835497 5.994327253232941 -3.0210928712214065]]])))))
